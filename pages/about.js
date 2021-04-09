@@ -9,13 +9,10 @@ export default function About() {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<main className={}>
+			<main>
 				<h2>About</h2>
-				<Link href="/"><a>Home</a></Link>
+				<Link href="/"><a>&larr; Homepage</a></Link>
 			</main>
-
-			<footer className={}>
-			</footer>
 		</div>
 	)
 }
