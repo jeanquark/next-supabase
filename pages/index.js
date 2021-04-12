@@ -1,9 +1,44 @@
 import Head from 'next/head'
 import Link from 'next/link'
+import { useEffect, useState } from "react"
+import { useRouter } from "next/router";
 import styles from '../styles/Home.module.css'
 import PostList from '../components/PostList'
 
 export default function Home() {
+	const router = useRouter();
+	const [isAuthed, setAuthStatus] = useState(false);
+	useEffect(() => {
+		fetch("./api/getUser")
+			.then((response) => response.json())
+			.then((result) => {
+				setAuthStatus(result.user && result.user.role === "authenticated");
+			});
+	}, []);
+
+	const signOutUser = async () => {
+		const res = await fetch(`/api/logout`);
+		if (res.status === 200) setAuthStatus(false);
+		// redirect to homepage when logging out users
+		if (window.location !== "/") router.push("/");
+	};
+
+	const fetchNextFixtures = async () => {
+		try {
+			// const data = await fetch("./api/api-football/fetchNextFixtures")
+			const data = await fetch("https://api-football-v1.p.rapidapi.com/v3/fixtures?date=2021-04-10", {
+				"method": "GET",
+				"headers": {
+					"x-rapidapi-host": "api-football-v1.p.rapidapi.com",
+					"x-rapidapi-key": "ee8055387bmshe390b7341fa3606p1de88djsn66982e43b0d1"
+				}
+			})
+			console.log('data: ', data)
+		} catch (error) {
+			console.log('error: ', error)
+		}
+	}
+
 	return (
 		<div>
 			<Head>
@@ -13,7 +48,31 @@ export default function Home() {
 
 			<main className={styles.main}>
 				<h2>Welcome to Next Supabase!</h2>
-				<Link href="/about"><a>About &rarr;</a></Link>
+				<div>
+					<span onClick={fetchNextFixtures}>Fetch next fixtures</span> |
+					<Link href="/about"><a>About</a></Link> |
+					<Link href="/protected"><a>Protected</a></Link> |
+
+					{isAuthed ? (
+						<>
+							<span onClick={signOutUser}>
+								<p>Sign Out</p>
+							</span>
+						</>
+					) : (
+						// If there is no authenticated user then we will link to the Sign-in and Sign Up pages
+						<>
+							<Link href="/signup">
+								<a>Sign Up</a>
+							</Link> |
+							<Link href="/login">
+								<a>Login</a>
+							</Link> |
+						</>
+					)}
+				</div>
+
+
 				<PostList />
 				<Link href="/events/1">
 					<a>Event 1 &rarr;</a>
