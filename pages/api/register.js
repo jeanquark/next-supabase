@@ -1,6 +1,7 @@
 import { supabase } from "../../utils/supabaseClient"
 
 export default async function registerUser(req, res) {
+  console.log('/api/register req.body: ', req.body)
   // destructure the e-mail and password received in the request body.
   const { email, password } = req.body
 

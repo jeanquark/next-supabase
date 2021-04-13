@@ -10,7 +10,7 @@ export default function Home() {
 	const router = useRouter();
 	const [isAuthed, setAuthStatus] = useState(false);
 	useEffect(() => {
-		fetch("./api/getUser")
+		fetch("/api/getUser")
 			.then((response) => response.json())
 			.then((result) => {
 				setAuthStatus(result.user && result.user.role === "authenticated");
