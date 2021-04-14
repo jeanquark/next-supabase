@@ -6,6 +6,7 @@ import styles from '../styles/Home.module.css'
 import PostList from '../components/PostList'
 import EventList from '../components/EventList'
 
+
 export default function Home() {
 	const router = useRouter();
 	const [isAuthed, setAuthStatus] = useState(false);
@@ -56,11 +57,24 @@ export default function Home() {
 						</>
 					)}
 				</div>
-
-
-				<PostList />
+				{/* <PostList /> */}
 				<EventList />
 			</main>
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+			
 
 			<footer className={styles.footer}>
 			</footer>

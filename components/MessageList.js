@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/initSupabase'
-import Moment from 'react-moment';
+import Moment from 'react-moment'
 
 export default function Messages() {
     const router = useRouter()
@@ -34,6 +34,7 @@ export default function Messages() {
             })
             .subscribe();
     }, [messages, setMessages])
+
     useEffect(() => {
         supabase.from('messages').on("DELETE", payload => {
             console.log('payload: ', payload)
@@ -66,13 +67,17 @@ export default function Messages() {
         const { data, error } = await supabase
             .from('messages')
             .insert([
-                { content: event.target.message.value, event_id: id, user_id: 1 }
+                { content: event.target.message.value, event_id: id, user_id: 1, user_email: authUser?.email }
             ])
         console.log('data: ', data)
+        event.target.message.value = ''
     }
 
-    const deleteMessage = async (event, messageId) => {
-        console.log('deleteMessage: ', event, messageId)
+    const deleteMessage = async (messageId, messageUserEmail) => {
+        console.log('deleteMessage: ', messageId, messageUserEmail)
+        if (messageUserEmail && messageUserEmail != authUser?.email) {
+            return alert('You cannot delete a message that is not yours.')
+        }
         const { data, error } = await supabase
             .from('messages')
             .delete()
@@ -82,14 +87,14 @@ export default function Messages() {
     } 
 
     return (
-        <div>
+        <div style={{ margin: '20px', padding: '0px 20px 20px 20px', border: '1px solid grey' }}>
             <h3>Chat forum</h3>
             {isAuthed ? 'isAuth' : 'is not auth'}<br />
-            {authUser?.email}
+            authUser: {authUser?.email}
             <div>
                 <ul>
                     {messages.map((message) => (
-                        <li key={message.id}>{message.content} - <i>by</i> {message.id} <i>at</i> <Moment format="HH:mm">{message.inserted_at}</Moment><button onClick={(e) => deleteMessage(e, message.id)}>Delete</button></li>
+                        <li key={message.id}>{message.content} - <i>by</i> {message?.user_email || 'anonymous'} <i>at</i> <Moment format="HH:mm">{message.inserted_at}</Moment>&nbsp;<button onClick={(e) => deleteMessage(message.id, message.user_email)}>&times;</button></li>
                     ))}
                 </ul>
                 <form onSubmit={sendMessage}>

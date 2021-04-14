@@ -16,7 +16,7 @@ export default function Events() {
     return (
         <div>
             <h3>Events:</h3>
-            <div>
+            <div className="card">
                 <ul>
                     {events.map((event) => (
                         <li key={event.id}>

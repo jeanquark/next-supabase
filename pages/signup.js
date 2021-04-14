@@ -26,6 +26,7 @@ export default function Form() {
             <Link href="/">
                 <a>&larr; Home</a>
             </Link>
+            <h3>Register</h3>
             <form onSubmit={registerUser}>
                 <label htmlFor="email">Email</label>
                 <input

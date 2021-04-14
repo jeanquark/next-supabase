@@ -20,6 +20,9 @@ export default async function fetchNextFixtures(req, res) {
                 home_team_id: response[i]['teams']['home']['id'],
                 visitor_team_name: response[i]['teams']['away']['name'],
                 visitor_team_id: response[i]['teams']['away']['id'],
+                venue: response[i]['fixture']['venue']['name'],
+                city: response[i]['fixture']['venue']['city'],
+                date: response[i]['fixture']['date'],
             })
         }
         console.log('[api/api-football/fetchNextFixtures] array: ', array)
