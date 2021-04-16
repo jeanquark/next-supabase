@@ -4,7 +4,9 @@ import Link from 'next/link'
 export async function getServerSideProps() {
 	// We need to implement `/api/getUser` by creating 
 	// an endpoint in `pages/api` but for now let's just call it
+	console.log('basePath: ', basePath)
 	const response = await fetch(`${basePath}/api/getUser`).then((response) =>
+	// const response = await fetch(`/api/getUser`).then((response) =>
 		response.json()
 	);
 	console.log('response: ', response)

@@ -57,7 +57,7 @@ export default function Home() {
 						</>
 					)}
 				</div>
-				{/* <PostList /> */}
+				<PostList />
 				<EventList />
 			</main>
 			
