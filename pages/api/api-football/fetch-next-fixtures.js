@@ -3,11 +3,11 @@ import { supabase } from "../../../utils/supabaseClient";
 export default async function fetchNextFixtures(req, res) {
     try {
         // 1) Request data from Football API
-        const data2 = await fetch("https://api-football-v1.p.rapidapi.com/v3/fixtures?from=2021-06-01&to=2021-07-31&league=4&season=2020", {
+        // const data = await fetch("https://api-football-v1.p.rapidapi.com/v3/fixtures?from=2021-06-01&to=2021-07-31&league=4&season=2020", {
+        const data2 = await fetch("https://v3.football.api-sports.io/fixtures?from=2021-06-01&to=2021-07-31&league=4&season=2020", {
             "method": "GET",
             "headers": {
-                "x-rapidapi-host": "api-football-v1.p.rapidapi.com",
-                "x-rapidapi-key": process.env.NEXT_PUBLIC_API_FOOTBALL_KEY
+                "x-apisports-key": process.env.NEXT_PUBLIC_API_FOOTBALL_KEY
             }
         })
         const { response } = await data2.json()
