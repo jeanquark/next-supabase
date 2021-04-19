@@ -38,6 +38,7 @@ export default function Home() {
 					<Link href="/api/api-football/fetch-next-fixtures"><a>Fetch next fixtures</a></Link>&nbsp;|&nbsp;
 					<Link href="/about"><a>About</a></Link>&nbsp;|&nbsp;
 					<Link href="/protected"><a>Protected</a></Link>&nbsp;|&nbsp;
+					<Link href="/fixtures"><a>Fixtures</a></Link>&nbsp;|&nbsp;
 
 					{isAuthed ? (
 						<>
