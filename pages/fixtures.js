@@ -1,13 +1,21 @@
 import React from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/initSupabase'
 import { makeStyles } from '@material-ui/core/styles'
+import { Auth } from '@supabase/ui'
+import Link from 'next/link'
+import Moment from 'react-moment'
+
 import Card from '@material-ui/core/Card'
 import CardActionArea from '@material-ui/core/CardActionArea'
 import CardActions from '@material-ui/core/CardActions'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
+import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
+import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
 
 const useStyles = makeStyles((theme) => ({
@@ -15,61 +23,82 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
     },
     media: {
-        height: 140,
+        height: 80,
+        textAlign: 'center'
     },
     paper: {
         padding: theme.spacing(2),
         textAlign: 'center',
+        fontSize: '2em',
         color: theme.palette.text.secondary,
     },
+    container: {
+        paddingLeft: theme.spacing(5),
+        paddingRight: theme.spacing(5)
+    },
+    avatar: {
+        display: 'flex',
+        '& > *': {
+            margin: theme.spacing(1),
+            width: theme.spacing(10),
+            height: theme.spacing(7),
+        },
+    }
 }))
 
-export default function MediaCard() {
+export default function Fixtures() {
     const classes = useStyles()
+    const { user, session } = Auth.useUser()
+    const [fixtures, setFixtures] = useState([])
+    useEffect(() => {
+        fetchFixtures();
+    }, [])
+
+    const fetchFixtures = async () => {
+        let { data: fixtures, error } = await supabase.from('events').select('*').order('id', true)
+        if (error) console.log('error', error)
+        else setFixtures(fixtures)
+    }
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
-                <Paper className={classes.paper}>xs=12</Paper>
+        <Container className={classes.container}>
+            <Link href="/"><a>Home</a></Link><br />
+            <Grid container spacing={0}>
+                <Grid item xs={12}>
+                    <h1 style={{ textAlign: 'center' }}>Fixtures:</h1>
+                </Grid>
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-                <Card className={classes.root}>
-                    <CardActionArea>
-                        <CardMedia className={classes.media} image="/static/images/cards/contemplative-reptile.jpg" title="Contemplative Reptile" />
-                        <CardContent>
-                            <Typography gutterBottom variant="h5" component="h2">
-                                Lizard
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary" component="p">
-                                Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica
-                            </Typography>
-                        </CardContent>
-                    </CardActionArea>
-                    <CardActions>
-                        <Button size="small" color="primary">
-                            Share
-                        </Button>
-                        <Button size="small" color="primary">
-                            Learn More
-                        </Button>
-                    </CardActions>
-                </Card>
+            <Grid container spacing={5}>
+                {fixtures.map((fixture) => (
+                    <Grid item xs={12} sm={6} md={3} key={fixture.id}>
+                        <Link href={`/events/${fixture.id}`}>
+                            <Card className={classes.root}>
+                                <CardActionArea>
+                                    <div style={{ display:'flex', justifyContent:'center' }}>
+                                        <CardMedia className={classes.media} title="Flags">
+                                        <div className={classes.avatar}>
+                                            <Avatar variant="square" alt="Country flag" src={fixture.home_team_image} />
+                                            <Avatar variant="square" alt="Country flag" src={fixture.visitor_team_image} className={classes.small} />
+                                            </div>
+                                        </CardMedia>
+                                    </div>
+                                    <CardContent>
+                                        <Typography gutterBottom variant="h6" component="h3">
+                                            {fixture.home_team_name} - {fixture.visitor_team_name}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary" component="p">
+                                            {fixture.venue}, {fixture.city}.
+                                        </Typography>
+                                        <Typography variant="caption" color="textPrimary" component="p">
+                                            <Moment format='ddd Do MMM YYYY HH:mm'>{fixture.date}</Moment>
+                                        </Typography>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
+                        </Link>
+                    </Grid>
+                ))}
             </Grid>
-            {/* <Grid item xs={6}>
-          <Paper className={classes.paper}>xs=6</Paper>
-        </Grid>
-        <Grid item xs={3}>
-          <Paper className={classes.paper}>xs=3</Paper>
-        </Grid>
-        <Grid item xs={3}>
-          <Paper className={classes.paper}>xs=3</Paper>
-        </Grid>
-        <Grid item xs={3}>
-          <Paper className={classes.paper}>xs=3</Paper>
-        </Grid>
-        <Grid item xs={3}>
-          <Paper className={classes.paper}>xs=3</Paper>
-        </Grid> */}
-        </Grid>
+        </Container>
     )
 }

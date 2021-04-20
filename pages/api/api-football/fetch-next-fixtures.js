@@ -16,10 +16,12 @@ export default async function fetchNextFixtures(req, res) {
         for (let i = 0; i < response.length; i++) {
             array.push({
                 fixture_id: response[i]['fixture']['id'],
-                home_team_name: response[i]['teams']['home']['name'],
                 home_team_id: response[i]['teams']['home']['id'],
-                visitor_team_name: response[i]['teams']['away']['name'],
+                home_team_name: response[i]['teams']['home']['name'],
+                home_team_image: response[i]['teams']['home']['logo'],
                 visitor_team_id: response[i]['teams']['away']['id'],
+                visitor_team_name: response[i]['teams']['away']['name'],
+                visitor_team_image: response[i]['teams']['away']['logo'],
                 venue: response[i]['fixture']['venue']['name'],
                 city: response[i]['fixture']['venue']['city'],
                 date: response[i]['fixture']['date'],

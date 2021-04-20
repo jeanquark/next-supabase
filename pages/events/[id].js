@@ -5,6 +5,7 @@ import Link from 'next/link'
 import MessageList from '../../components/MessageList'
 import Moment from 'react-moment'
 
+
 const Event = () => {
     const router = useRouter()
     const { id } = router.query

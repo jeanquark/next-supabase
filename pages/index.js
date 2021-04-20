@@ -2,12 +2,14 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router";
+import { Auth } from '@supabase/ui'
 import styles from '../styles/Home.module.css'
 import PostList from '../components/PostList'
 import EventList from '../components/EventList'
 
 
 export default function Home() {
+	const { user, session } = Auth.useUser()
 	const router = useRouter();
 	const [isAuthed, setAuthStatus] = useState(false);
 	useEffect(() => {
@@ -34,6 +36,7 @@ export default function Home() {
 
 			<main className={styles.main}>
 				<h2>Welcome to Next Supabase!</h2>
+				<p>User: {user?.email}</p>
 				<div>
 					<Link href="/api/api-football/fetch-next-fixtures"><a>Fetch next fixtures</a></Link>&nbsp;|&nbsp;
 					<Link href="/about"><a>About</a></Link>&nbsp;|&nbsp;
@@ -61,22 +64,7 @@ export default function Home() {
 				<PostList />
 				<EventList />
 			</main>
-			
-
-
-
-
-
-
-
-
-
-
-
-
-
-			
-
+		
 			<footer className={styles.footer}>
 			</footer>
 		</div>
