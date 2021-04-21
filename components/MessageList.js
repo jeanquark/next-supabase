@@ -86,7 +86,7 @@ export default function Messages() {
             setMessages(messages)
         }
     }
-    const subscribeMessages = async () => {}
+    const subscribeMessages = async () => { }
 
     const unsubscribeMessages = async () => {
         supabase.removeSubscription(messages)
@@ -134,58 +134,41 @@ export default function Messages() {
                 </div>
             </div> */}
 
-            <Container className={classes.container}>
-                <Link href="/">
-                    <a>Home</a>
-                </Link>
-                <br />
-                <Link href="/fixtures">
-                    <a>Fixtures</a>
-                </Link>
-                <br />
-                <Grid container spacing={0}>
-                    <Grid item xs={12} sm={6}>
-                        <h1 style={{ textAlign: 'center' }}>Event:</h1>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <h1 style={{ textAlign: 'center' }}>Chatroom:</h1>
+            <h1 style={{ textAlign: 'center' }}>Chatroom:</h1>
                         user: {user?.email}
-                        <Box mb={5} mx={1}>
-                            <form onSubmit={sendMessage}>
-                                <Grid container spacing={10}>
-                                    <Grid className="d-flex" style={{ display: 'flex' }} item form="maincomponent" xs>
-                                        <TextField id="message" label="Your message" fullWidth />
-                                        <Button type="submit" variant="contained" color="primary" size="small">
-                                            Send
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </form>
-                        </Box>
-                        <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
-                            {messages.map((message) => (
-                                <Box key={message.id}>
-                                    <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
-                                        {message.content}
-                                        <br />
-                                        <Box display="flex" flexDirection="row-reverse">
-                                            <i>
-                                                {message?.user_email?.split('@')[0] || 'anonymous'}&nbsp;<Moment format="HH:mm">{message.inserted_at}</Moment>
-                                            </i>
-                                            <DeleteIcon color="error" className={classes.button} />
-                                            {/* {message.user_id === user?.id ? <DeleteIcon color="error" className="deleteButton" onClick={(e) => deleteMessage(message.id, message.user_email)} /> : ''} */}
-                                            {/* <IconButton aria-label="delete">
+            <Box mb={5} mx={1}>
+                <form onSubmit={sendMessage}>
+                    <Grid container spacing={10}>
+                        <Grid className="d-flex" style={{ display: 'flex' }} item form="maincomponent" xs>
+                            <TextField id="message" label="Your message" fullWidth />
+                            <Button type="submit" variant="contained" color="primary" size="small">
+                                Send
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </form>
+            </Box>
+            <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
+                {messages.map((message) => (
+                    <Box key={message.id}>
+                        <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
+                            {message.content}
+                            <br />
+                            <Box display="flex" flexDirection="row-reverse">
+                                <i>
+                                    {message?.user_email?.split('@')[0] || 'anonymous'}&nbsp;<Moment format="HH:mm">{message.inserted_at}</Moment>
+                                </i>
+                                <DeleteIcon color="error" className={classes.button} />
+                                {/* {message.user_id === user?.id ? <DeleteIcon color="error" className="deleteButton" onClick={(e) => deleteMessage(message.id, message.user_email)} /> : ''} */}
+                                {/* <IconButton aria-label="delete">
                                                 <DeleteIcon fontSize="small" color="error" />
                                             </IconButton> */}
-                                        </Box>
-                                    </Paper>
-                                </Box>
-                            ))}
-                            <div ref={messagesEndRef} />
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Container>
+                            </Box>
+                        </Paper>
+                    </Box>
+                ))}
+                <div ref={messagesEndRef} />
+            </Box>
         </>
     )
 }

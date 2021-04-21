@@ -17,6 +17,7 @@ import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
+import { AppBar, Toolbar, Box } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,45 +61,70 @@ export default function Fixtures() {
         else setFixtures(fixtures)
     }
 
+    async function logoutHandler(e) {
+        console.log('e: ', e)
+        const { error } = await supabase.auth.signOut()
+        console.log('error: ', error)
+    }
+
     return (
-        <Container className={classes.container}>
-            <Link href="/"><a>Home</a></Link><br />
-            <Grid container spacing={0}>
-                <Grid item xs={12}>
-                    <h1 style={{ textAlign: 'center' }}>Fixtures:</h1>
-                </Grid>
-            </Grid>
-            <Grid container spacing={5}>
-                {fixtures.map((fixture) => (
-                    <Grid item xs={12} sm={6} md={3} key={fixture.id}>
-                        <Link href={`/events/${fixture.id}`}>
-                            <Card className={classes.root}>
-                                <CardActionArea>
-                                    <div style={{ display:'flex', justifyContent:'center' }}>
-                                        <CardMedia className={classes.media} title="Flags">
-                                        <div className={classes.avatar}>
-                                            <Avatar variant="square" alt="Country flag" src={fixture.home_team_image} />
-                                            <Avatar variant="square" alt="Country flag" src={fixture.visitor_team_image} className={classes.small} />
+        <>
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="h6" className={classes.title}>
+                        Fixtures
+                    </Typography>
+                    <Link href="/"><a>Home</a></Link><br />
+                    {user ?
+                        <Box my={3}>
+                            <Button color="inherit" onClick={logoutHandler}>Logout</Button>
+                        </Box> : <Box my={3}>
+                            <Link href="/">
+                                <a>
+                                    Login
+						        </a>
+                            </Link>
+                        </Box>
+                    }
+                    user.email: {user?.email}
+
+                </Toolbar>
+            </AppBar>
+            <Container className={classes.container}>
+                <Box my={5}>
+                    <Grid container spacing={5}>
+                        {fixtures.map((fixture) => (
+                            <Grid item xs={12} sm={6} md={3} key={fixture.id}>
+                                <Link href={`/events/${fixture.id}`}>
+                                    <Card className={classes.root}>
+                                        <CardActionArea>
+                                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                <CardMedia className={classes.media} title="Flags">
+                                                    <div className={classes.avatar}>
+                                                        <Avatar variant="square" alt="Country flag" src={fixture.home_team_image} />
+                                                        <Avatar variant="square" alt="Country flag" src={fixture.visitor_team_image} className={classes.small} />
+                                                    </div>
+                                                </CardMedia>
                                             </div>
-                                        </CardMedia>
-                                    </div>
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h6" component="h3">
-                                            {fixture.home_team_name} - {fixture.visitor_team_name}
+                                            <CardContent>
+                                                <Typography gutterBottom variant="h6" component="h3">
+                                                    {fixture.home_team_name} - {fixture.visitor_team_name}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary" component="p">
+                                                    {fixture.venue}, {fixture.city}.
                                         </Typography>
-                                        <Typography variant="body2" color="textSecondary" component="p">
-                                            {fixture.venue}, {fixture.city}.
-                                        </Typography>
-                                        <Typography variant="caption" color="textPrimary" component="p">
-                                            <Moment format='ddd Do MMM YYYY HH:mm'>{fixture.date}</Moment>
-                                        </Typography>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
-                        </Link>
+                                                <Typography variant="caption" color="textPrimary" component="p">
+                                                    <Moment format='ddd Do MMM YYYY HH:mm'>{fixture.date}</Moment>
+                                                </Typography>
+                                            </CardContent>
+                                        </CardActionArea>
+                                    </Card>
+                                </Link>
+                            </Grid>
+                        ))}
                     </Grid>
-                ))}
-            </Grid>
-        </Container>
+                </Box>
+            </Container>
+        </>
     )
 }
