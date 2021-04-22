@@ -86,7 +86,7 @@ export default function Messages() {
             setMessages(messages)
         }
     }
-    const subscribeMessages = async () => { }
+    const subscribeMessages = async () => {}
 
     const unsubscribeMessages = async () => {
         supabase.removeSubscription(messages)
@@ -135,19 +135,6 @@ export default function Messages() {
             </div> */}
 
             <h1 style={{ textAlign: 'center' }}>Chatroom:</h1>
-                        user: {user?.email}
-            <Box mb={5} mx={1}>
-                <form onSubmit={sendMessage}>
-                    <Grid container spacing={10}>
-                        <Grid className="d-flex" style={{ display: 'flex' }} item form="maincomponent" xs>
-                            <TextField id="message" label="Your message" fullWidth />
-                            <Button type="submit" variant="contained" color="primary" size="small">
-                                Send
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </form>
-            </Box>
             <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
                 {messages.map((message) => (
                     <Box key={message.id}>
@@ -168,6 +155,18 @@ export default function Messages() {
                     </Box>
                 ))}
                 <div ref={messagesEndRef} />
+            </Box>
+            <Box mt={4} mx={1}>
+                <form onSubmit={sendMessage}>
+                    <Grid container spacing={10}>
+                        <Grid className="d-flex" style={{ display: 'flex' }} item form="maincomponent" xs>
+                            <TextField id="message" label="Your message" fullWidth />
+                            <Button type="submit" variant="contained" color="primary" size="small">
+                                Send
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </form>
             </Box>
         </>
     )

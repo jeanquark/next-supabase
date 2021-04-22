@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Auth } from '@supabase/ui'
 import Link from 'next/link'
 import Moment from 'react-moment'
+import Navbar from '../components/Navbar'
 
 import Card from '@material-ui/core/Card'
 import CardActionArea from '@material-ui/core/CardActionArea'
@@ -13,11 +14,7 @@ import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
-import Typography from '@material-ui/core/Typography'
-import Paper from '@material-ui/core/Paper'
-import Container from '@material-ui/core/Container'
-import Grid from '@material-ui/core/Grid'
-import { AppBar, Toolbar, Box } from '@material-ui/core'
+import { AppBar, Toolbar, Container, Grid, Box, Typography, Paper } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     },
     media: {
         height: 80,
-        textAlign: 'center'
+        textAlign: 'center',
     },
     paper: {
         padding: theme.spacing(2),
@@ -35,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     },
     container: {
         paddingLeft: theme.spacing(5),
-        paddingRight: theme.spacing(5)
+        paddingRight: theme.spacing(5),
     },
     avatar: {
         display: 'flex',
@@ -44,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
             width: theme.spacing(10),
             height: theme.spacing(7),
         },
-    }
+    },
 }))
 
 export default function Fixtures() {
@@ -52,7 +49,7 @@ export default function Fixtures() {
     const { user, session } = Auth.useUser()
     const [fixtures, setFixtures] = useState([])
     useEffect(() => {
-        fetchFixtures();
+        fetchFixtures()
     }, [])
 
     const fetchFixtures = async () => {
@@ -69,7 +66,7 @@ export default function Fixtures() {
 
     return (
         <>
-            <AppBar position="static">
+            {/* <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
                         Fixtures
@@ -89,7 +86,9 @@ export default function Fixtures() {
                     user.email: {user?.email}
 
                 </Toolbar>
-            </AppBar>
+            </AppBar> */}
+            <Navbar title={'Fixtures'} />
+
             <Container className={classes.container}>
                 <Box my={5}>
                     <Grid container spacing={5}>
@@ -112,9 +111,9 @@ export default function Fixtures() {
                                                 </Typography>
                                                 <Typography variant="body2" color="textSecondary" component="p">
                                                     {fixture.venue}, {fixture.city}.
-                                        </Typography>
+                                                </Typography>
                                                 <Typography variant="caption" color="textPrimary" component="p">
-                                                    <Moment format='ddd Do MMM YYYY HH:mm'>{fixture.date}</Moment>
+                                                    <Moment format="ddd Do MMM YYYY HH:mm">{fixture.date}</Moment>
                                                 </Typography>
                                             </CardContent>
                                         </CardActionArea>
