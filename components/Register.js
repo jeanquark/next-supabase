@@ -19,6 +19,7 @@ import Grid from '@material-ui/core/Grid'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
+import { ErrorSharp } from '@material-ui/icons'
 
 function Copyright() {
     return (
@@ -72,37 +73,86 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const signInUser = async (event) => {
-    try {
-        event.preventDefault()
-        console.log('signInUser: ', event)
-
-        let { user, error } = await supabase.auth.signIn({
-            email: event.target.email.value,
-            password: event.target.password.value,
-        })
-        if (error) {
-            console.log('error: ', error)
-        }
-        console.log('user: ', user)
-    } catch (error) {
-        console.log('error: ', error)
-    }
-}
-
-async function googleOAuthHandler() {
-    console.log('googleOAuthHandler')
-    const { user, session, error } = await supabase.auth.signIn({
-        provider: 'google',
-        // redirectTo: 'http://localhost:3000/fixtures',
-    })
-    console.log('user: ', user)
-    console.log('session: ', session)
-    console.log('error: ', error)
-}
-
 export default function Register(props) {
     const classes = useStyles()
+    const router = useRouter()
+    const [errors, setErrors] = useState({
+        email: {
+            show: false,
+            message: '',
+        },
+        password: {
+            show: false,
+            message: '',
+        },
+        password_confirmation: {
+            show: false,
+            message: '',
+        },
+    })
+
+    async function signUpUser(event) {
+        try {
+            event.preventDefault()
+            setErrors({
+                email: {
+                    show: false,
+                    message: '',
+                },
+                password: {
+                    show: false,
+                    message: '',
+                },
+                password_confirmation: {
+                    show: false,
+                    message: '',
+                },
+            })
+            console.log('signInUser: ', event)
+            if (!event.target.email.value) {
+                setErrors({
+                    ...errors,
+                    email: {
+                        show: true,
+                        message: 'Email is required',
+                    },
+                })
+            }
+            if (!event.target.password.value) {
+                setErrors({
+                    ...errors,
+                    password: {
+                        show: true,
+                        message: 'Password is required',
+                    },
+                })
+            }
+            if (event.target.password.value !== event.target.password_confirmation.value) {
+                setErrors({
+                    ...errors,
+                    password_confirmation: {
+                        show: true,
+                        message: 'Password confirmation does not match',
+                    },
+                })
+            }
+
+            const { user, session, error } = await supabase.auth.signUp({
+                email: event.target.email.value,
+                password: event.target.password.value,
+            })
+            if (error) {
+                console.log('error: ', error)
+                alert(error.message)
+                return
+            }
+            console.log('user: ', user)
+            console.log('session: ', session)
+            router.push('/fixtures')
+        } catch (error) {
+            console.log('error: ', error)
+        }
+    }
     return (
         <div className={classes.paper}>
             <Avatar className={classes.avatar}>
@@ -111,9 +161,33 @@ export default function Register(props) {
             <Typography component="h1" variant="h5">
                 Register
             </Typography>
-            <form className={classes.form} noValidate onSubmit={signInUser}>
-                <TextField variant="outlined" margin="normal" required fullWidth id="email" label="Email Address" name="email" autoComplete="email" autoFocus />
-                <TextField variant="outlined" margin="normal" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password" />
+            <form className={classes.form} noValidate onSubmit={signUpUser}>
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    error={errors.email.show}
+                    helperText={errors.email.message}
+                />
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    error={errors.password.show}
+                    helperText={errors.password.message}
+                />
                 <TextField
                     variant="outlined"
                     margin="normal"
@@ -124,6 +198,8 @@ export default function Register(props) {
                     type="password"
                     id="password_confirmation"
                     autoComplete="current-password"
+                    error={errors.password_confirmation.show}
+                    helperText={errors.password_confirmation.message}
                 />
                 <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
                     Register

@@ -53,14 +53,12 @@ const Event = () => {
 
     return (
         <>
-            
-
             <Navbar title={"Event"} links={['fixtures']} />
 
             <Container className={classes.container}>
                 <Grid container spacing={0}>
                     <Grid item xs={12} sm={6}>
-                        <EventDetails event={event} />
+                        {/* <EventDetails event={event} /> */}
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <MessageList />

@@ -6,12 +6,13 @@ import Moment from 'react-moment'
 const useStyles = makeStyles((theme) => ({
     avatar: {
         display: 'flex',
-        '& > *': {
-            margin: theme.spacing(1),
-            width: theme.spacing(10),
-            height: theme.spacing(7),
-            
-        },
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    large: {
+        width: theme.spacing(10),
+        height: theme.spacing(10),
+        margin: theme.spacing(1),
     },
 }))
 
@@ -21,10 +22,10 @@ export default function EventDetails(props) {
         <Box>
             <Box display="flex" style={{ margin: 10, padding: 8 }}>
                 <Box m="auto">
-                    <div className={classes.avatar}>
-                        <Avatar variant="square" alt="Home team image" src={props.event.home_team_image} />
-                        <Avatar variant="square" alt="Visitor team image" src={props.event.visitor_team_image} className={classes.small} />
-                    </div>
+                    <Box className={classes.avatar}>
+                        <Avatar variant="square" alt="Home team image" src={props.event.home_team_image} className={classes.large} />
+                        <Avatar variant="square" alt="Visitor team image" src={props.event.visitor_team_image} className={classes.large} />
+                    </Box>
                     <Typography variant="h5" align="center">
                         {props.event.home_team_name} - {props.event.visitor_team_name}
                     </Typography>
