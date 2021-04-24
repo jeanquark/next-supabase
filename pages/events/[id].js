@@ -65,7 +65,6 @@ const Event = () => {
                 <Grid container spacing={0}>
                     <Grid item xs={12} sm={6}>
                         <EventDetails event={event} />
-                        user.id: {user?.id}
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <MessageList />

@@ -33,7 +33,6 @@ function Copyright() {
     )
 }
 
-
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100vh',
@@ -73,14 +72,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-
-
 const googleOAuthHandler = async () => {
     console.log('googleOAuthHandler')
-    const { user, session, error } = await supabase.auth.signIn({
-        provider: 'google',
-        // redirectTo: 'http://localhost:3000/fixtures',
-    })
+    const { user, session, error } = await supabase.auth.signIn(
+        {
+            provider: 'google',
+        },
+        {
+            redirectTo: 'http://localhost:3000/fixtures',
+        }
+    )
     console.log('user: ', user)
     console.log('session: ', session)
     console.log('error: ', error)
@@ -89,41 +90,41 @@ const googleOAuthHandler = async () => {
     // }
 }
 
-
 export default function Login(props) {
     const classes = useStyles()
     const router = useRouter()
     const [errors, setErrors] = useState({
         password: {
             show: false,
-            message: ''
-        }
+            message: '',
+        },
     })
 
     const signInUser = async (event) => {
         try {
             event.preventDefault()
             console.log('signInUser: ', event)
-    
+
             let { user, error } = await supabase.auth.signIn({
                 email: event.target.email.value,
                 password: event.target.password.value,
             })
             if (error) {
                 console.log('error: ', error)
-                setErrors({...errors,  password: {
-                    show: true,
-                    message: error.message,
-               }})
-               return
+                setErrors({
+                    ...errors,
+                    password: {
+                        show: true,
+                        message: error.message,
+                    },
+                })
+                return
             }
             console.log('user: ', user)
             router.push('/fixtures')
         } catch (error) {
             console.log('error: ', error)
         }
-
-        
     }
 
     return (
@@ -136,8 +137,20 @@ export default function Login(props) {
             </Typography>
             <form className={classes.form} noValidate onSubmit={signInUser}>
                 <TextField variant="outlined" margin="normal" required fullWidth id="email" label="Email Address" name="email" autoComplete="email" autoFocus />
-                <TextField variant="outlined" margin="normal" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password" error={errors.password.show} helperText={errors.password.message} />
-                
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    error={errors.password.show}
+                    helperText={errors.password.message}
+                />
+
                 <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
                 <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
                     Sign In
