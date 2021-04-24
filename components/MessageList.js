@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
         paddingRight: theme.spacing(5),
     },
     button: {
+        verticalAlign: 'text-top',
         '&:hover': {
             color: '#000',
             cursor: 'pointer',
@@ -42,6 +43,7 @@ export default function Messages() {
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
     const [newMessage, handleNewMessage] = useState('')
+    const [deletedMessage, handleDeletedMessage] = useState('')
     const [error, setError] = useState('')
     const [loadingInitial, setLoadingInitial] = useState(true)
     const [isSending, setIsSending] = useState(false)
@@ -56,6 +58,13 @@ export default function Messages() {
             scrollToBottom()
         }
     }, [newMessage])
+
+    useEffect(() => {
+        if (deletedMessage) {
+            // console.log("newMessage :>> ", newMessage);
+            console.log('deletedMessage useEffect: ', deletedMessage)
+        }
+    }, [deletedMessage])
 
     const getInitialMessages = async () => {
         if (!messages.length) {
@@ -74,15 +83,30 @@ export default function Messages() {
     const getMessagesAndSubscribe = async () => {
         setError('')
         getInitialMessages()
+        console.log('getMessagesAndSubscribe')
         if (!mySubscription) {
             mySubscription = supabase
                 .from(`messages:event_id=eq.${id}`)
-                .on('INSERT', (payload) => {
+                .on('*', (payload) => {
                     console.log('getMessagesAndSubscribe payload: ', payload)
                     handleNewMessage(payload.new)
                 })
                 .subscribe()
+        } else {
+            console.log('Delete message')
         }
+
+        // supabase
+        //     .from('messages')
+        //     .on('DELETE', (payload) => {
+        //         console.log('payload: ', payload)
+        //         // handleDeletedMessage(payload.old)
+        //         const newMessagesList = messages.filter((item) => item.id !== payload.old.id)
+        //         console.log('newMessagesList: ', newMessagesList)
+        //         // setMessages(newMessagesList)
+        //     })
+        //     .subscribe()
+
     }
     useEffect(() => {
         // console.log("useSupabase() effect ran!");
@@ -162,7 +186,7 @@ export default function Messages() {
         setIsSending(true)
         if (!message) return
         try {
-            const { data, error } = await supabase.from('messages').insert([{ content: message, event_id: id }])
+            const { data, error } = await supabase.from('messages').insert([{ content: message, event_id: id, user_id: user?.id, user_email: user?.email }])
 
             if (error) {
                 alert(error.message)
@@ -186,6 +210,7 @@ export default function Messages() {
         const { data, error } = await supabase.from('messages').delete().match({ id: messageId })
         console.log('data: ', data)
         console.log('error: ', error)
+        console.log('mySubscription: ', mySubscription)
     }
 
     return (
@@ -210,16 +235,19 @@ export default function Messages() {
                 </div>
             </div> */}
             <h1 style={{ textAlign: 'center' }}>Chatroom:</h1>
-            user.id: {user?.id}
+            user.id: {user?.id}<br />
+            isSending: {isSending}
             <br />
             <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
                 {messages.map((message) => (
-                    <Box key={message.id}>
+                    <Box key={message.id} ml={user.id === message.user_id ? 0 : 6} mr={user.id === message.user_id ? 6 : 0}>
                         <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
                             {message.content}
                             <br />
                             <Box display="flex" flexDirection="row-reverse">
-                                <DeleteIcon color="error" className={classes.button} />
+                                {(message.user_id === user?.id || !message.user_id) &&
+                                    <DeleteIcon color="error" className={classes.button} onClick={(e) => deleteMessage(message.id, message.user_email)} />
+                                }
                                 <i>
                                     {message?.user_email?.split('@')[0] || 'anonymous'}&nbsp;<Moment format="HH:mm">{message.inserted_at}</Moment>
                                 </i>
@@ -237,7 +265,7 @@ export default function Messages() {
                 <form onSubmit={sendMessage}>
                     <Grid container spacing={10}>
                         <Grid className="d-flex" style={{ display: 'flex' }} item form="maincomponent" xs>
-                            <TextField id="message" label="Your message" fullWidth onChange={(e) => setMessage(e.target.value)} />
+                            <TextField id="message" label="Your message" fullWidth value={message} onChange={(e) => setMessage(e.target.value)} />
                             <Button type="submit" variant="contained" color="primary" size="small" disabled={!message}>
                                 Send
                             </Button>

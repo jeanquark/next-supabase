@@ -5,7 +5,7 @@ import { supabase } from '../lib/initSupabase'
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-async function googleOAuthHandler() {
+const googleOAuthHandler = async () => {
     console.log('googleOAuthHandler')
     const { user, session, error } = await supabase.auth.signIn({
         provider: 'google',
@@ -84,10 +84,15 @@ async function googleOAuthHandler() {
     console.log('user: ', user)
     console.log('session: ', session)
     console.log('error: ', error)
+    // if (user) {
+    //     router.push('/fixtures')
+    // }
 }
+
 
 export default function Login(props) {
     const classes = useStyles()
+    const router = useRouter()
     const [errors, setErrors] = useState({
         password: {
             show: false,
@@ -110,11 +115,15 @@ export default function Login(props) {
                     show: true,
                     message: error.message,
                }})
+               return
             }
             console.log('user: ', user)
+            router.push('/fixtures')
         } catch (error) {
             console.log('error: ', error)
         }
+
+        
     }
 
     return (

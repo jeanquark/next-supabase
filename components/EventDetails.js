@@ -37,6 +37,7 @@ export default function EventDetails(props) {
                     </Typography>
                     <Typography component="p" align="center">
                         <Moment format="ddd Do MMM YYYY, HH:mm">{props.event.date}</Moment>
+                        {/* {props.event.date} */}
                     </Typography>
                 </Box>
             </Box>
