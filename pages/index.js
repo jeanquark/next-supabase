@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 	},
-}))
+}), { index: 1 })
 
 
 const fetcher = (url, token) =>

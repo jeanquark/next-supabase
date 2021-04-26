@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(10),
         margin: theme.spacing(1),
     },
-}))
+}), { index: 1 })
 
 export default function EventDetails(props) {
     const classes = useStyles()
