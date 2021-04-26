@@ -82,6 +82,11 @@ jobs:
             - name: 📂 List files
               run: | 
                ls -la
+            - name: Create .env file
+              uses: SpicyPizza/create-envfile@v1
+              with:
+                envkey_NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+                envkey_NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
             - name: 💾 Install
               run: npm install
             - name: 🔨 Build
