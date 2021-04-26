@@ -74,20 +74,22 @@ const useStyles = makeStyles((theme) => ({
 
 const googleOAuthHandler = async () => {
     console.log('googleOAuthHandler')
+    console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
+    console.log('process.env.BASE_URL: ', process.env.NEXT_PUBLIC_BASE_URL)
+
+    
     const { user, session, error } = await supabase.auth.signIn(
         {
             provider: 'google',
         },
         {
-            redirectTo: 'http://localhost:3000/fixtures',
+            // redirectTo: 'http://localhost:3000/fixtures',
+            redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/fixtures`
         }
     )
     console.log('user: ', user)
     console.log('session: ', session)
     console.log('error: ', error)
-    // if (user) {
-    //     router.push('/fixtures')
-    // }
 }
 
 export default function Login(props) {
