@@ -88,11 +88,11 @@ export default function index() {
 				body: JSON.stringify({ event, session }),
 			})
 				.then((res) => res.json())
-				// .then(() => {
-				// 	if (event === 'SIGNED_IN') {
-				// 		router.push('/fixtures')
-				// 	}
-				// })
+			// .then(() => {
+			// 	if (event === 'SIGNED_IN') {
+			// 		router.push('/fixtures')
+			// 	}
+			// })
 		})
 
 		return () => {
@@ -116,9 +116,10 @@ export default function index() {
 									enter as guest
                                 </Button>
 							</Link>
-							user.id: {user?.id}<br /><br />
-							Monday April 26, 17:04.
 						</Grid>
+					</Grid>
+					<Grid container justify="center" alignItems="flex-end">
+						<p>Last deployment time: Monday April 26, 17:22.</p>
 					</Grid>
 				</Grid>
 				<Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
