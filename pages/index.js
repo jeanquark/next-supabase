@@ -111,7 +111,8 @@ export default function index() {
 									enter as guest
                                 </Button>
 							</Link>
-								user.id: {user?.id}
+							user.id: {user?.id}<br /><br />
+							Monday April 26, 14:06.
 						</Grid>
 					</Grid>
 				</Grid>
