@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/initSupabase'
 import { makeStyles } from '@material-ui/core/styles'
 import { Auth } from '@supabase/ui'
+import Head from 'next/head'
 import Link from 'next/link'
 import Moment from 'react-moment'
 import Navbar from '../components/Navbar'
@@ -66,6 +67,10 @@ export default function Fixtures() {
 
     return (
         <>
+        <Head>
+				<title>Fixtures</title>
+				<link rel="icon" href="/favicon.ico" />
+			</Head>
             {/* <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>

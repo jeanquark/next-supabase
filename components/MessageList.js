@@ -95,18 +95,6 @@ export default function Messages() {
         } else {
             console.log('Delete message')
         }
-
-        // supabase
-        //     .from('messages')
-        //     .on('DELETE', (payload) => {
-        //         console.log('payload: ', payload)
-        //         // handleDeletedMessage(payload.old)
-        //         const newMessagesList = messages.filter((item) => item.id !== payload.old.id)
-        //         console.log('newMessagesList: ', newMessagesList)
-        //         // setMessages(newMessagesList)
-        //     })
-        //     .subscribe()
-
     }
     useEffect(() => {
         // console.log("useSupabase() effect ran!");
@@ -135,51 +123,51 @@ export default function Messages() {
     //         .subscribe()
     // }, [messages, setMessages])
 
-    // useEffect(() => {
-    //     supabase
-    //         .from('messages')
-    //         .on('DELETE', (payload) => {
-    //             console.log('payload: ', payload)
-    //             const newMessagesList = messages.filter((item) => item.id !== payload.old.id)
-    //             console.log('newMessagesList: ', newMessagesList)
-    //             setMessages(newMessagesList)
-    //         })
-    //         .subscribe()
-    // }, [messages, setMessages])
+    useEffect(() => {
+        supabase
+            .from('messages')
+            .on('DELETE', (payload) => {
+                console.log('payload: ', payload)
+                const newMessagesList = messages.filter((item) => item.id !== payload.old.id)
+                console.log('newMessagesList: ', newMessagesList)
+                setMessages(newMessagesList)
+            })
+            .subscribe()
+    }, [messages, setMessages])
 
     const scrollToBottom = () => {
         console.log('scrollToBottom')
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
 
-    const fetchMessages = async (id) => {
-        let { data: messages, error } = await supabase.from('messages').select('*').eq('event_id', id)
-        if (error) {
-            console.log('error', error)
-        } else {
-            console.log('messages: ', messages)
-            setMessages(messages)
-        }
-    }
-    const subscribeMessages = async () => {}
+    // const fetchMessages = async (id) => {
+    //     let { data: messages, error } = await supabase.from('messages').select('*').eq('event_id', id)
+    //     if (error) {
+    //         console.log('error', error)
+    //     } else {
+    //         console.log('messages: ', messages)
+    //         setMessages(messages)
+    //     }
+    // }
+    // const subscribeMessages = async () => {}
 
-    const unsubscribeMessages = async () => {
-        supabase.removeSubscription(messages)
-    }
+    // const unsubscribeMessages = async () => {
+    //     supabase.removeSubscription(messages)
+    // }
 
-    const sendMessage2 = async (event) => {
-        event.preventDefault()
-        console.log('sendMessage: ', event)
-        console.log('sendMessage event.target.message.value: ', event.target.message.value)
-        const { data, error } = await supabase.from('messages').insert([{ content: event.target.message.value, event_id: id, user_id: user?.id, user_email: user?.email }])
-        if (error) {
-            alert(error.message)
-            return
-        }
-        console.log('data: ', data)
-        event.target.message.value = ''
-        scrollToBottom()
-    }
+    // const sendMessage2 = async (event) => {
+    //     event.preventDefault()
+    //     console.log('sendMessage: ', event)
+    //     console.log('sendMessage event.target.message.value: ', event.target.message.value)
+    //     const { data, error } = await supabase.from('messages').insert([{ content: event.target.message.value, event_id: id, user_id: user?.id, user_email: user?.email }])
+    //     if (error) {
+    //         alert(error.message)
+    //         return
+    //     }
+    //     console.log('data: ', data)
+    //     event.target.message.value = ''
+    //     scrollToBottom()
+    // }
 
     const sendMessage = async (e) => {
         e.preventDefault()
@@ -215,32 +203,11 @@ export default function Messages() {
 
     return (
         <>
-            {/* <div style={{ margin: '20px', padding: '0px 20px 20px 20px', border: '1px solid grey' }}>
-                <h3>Chat forum</h3>
-                user: {user?.email}
-                <div>
-                    <ul>
-                        {messages.map((message) => (
-                            <li key={message.id}>
-                                {message.content} - <i>by</i> {message?.user_email || 'anonymous'} <i>at</i> <Moment format="HH:mm">{message.inserted_at}</Moment>&nbsp;
-                                <button onClick={(e) => deleteMessage(message.id, message.user_email)}>&times;</button>
-                            </li>
-                        ))}
-                    </ul>
-                    <form onSubmit={sendMessage}>
-                        <label htmlFor="message">Your message</label>
-                        <input id="message" name="message" type="text" autoComplete="message" required />
-                        <button type="submit">Send</button>
-                    </form>
-                </div>
-            </div> */}
             <h1 style={{ textAlign: 'center' }}>Chatroom:</h1>
-            user.id: {user?.id}<br />
-            isSending: {isSending}
             <br />
             <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
                 {messages.map((message) => (
-                    <Box key={message.id} ml={user.id === message.user_id ? 0 : 6} mr={user.id === message.user_id ? 6 : 0}>
+                    <Box key={message.id} ml={user?.id === message.user_id ? 0 : 6} mr={user?.id === message.user_id ? 6 : 0}>
                         <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
                             {message.content}
                             <br />
@@ -251,10 +218,6 @@ export default function Messages() {
                                 <i>
                                     {message?.user_email?.split('@')[0] || 'anonymous'}&nbsp;<Moment format="HH:mm">{message.inserted_at}</Moment>
                                 </i>
-                                {/* {message.user_id === user?.id ? <DeleteIcon color="error" className="deleteButton" onClick={(e) => deleteMessage(message.id, message.user_email)} /> : ''} */}
-                                {/* <IconButton aria-label="delete">
-                                                <DeleteIcon fontSize="small" color="error" />
-                                            </IconButton> */}
                             </Box>
                         </Paper>
                     </Box>
