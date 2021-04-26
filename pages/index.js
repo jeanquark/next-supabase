@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 	},
-}), { index: 1 })
+}))
 
 
 const fetcher = (url, token) =>
@@ -119,7 +119,7 @@ export default function index() {
 						</Grid>
 					</Grid>
 					<Grid container justify="center" alignItems="flex-end">
-						<p>Last deployment time: Monday April 26, 17:22.</p>
+						<p>Last deployment time: Monday April 26, 18:25.</p>
 					</Grid>
 				</Grid>
 				<Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
