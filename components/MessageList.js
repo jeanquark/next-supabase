@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
             cursor: 'pointer',
         },
     },
-}), { index: 1 })
+}))
 
 export default function Messages() {
     const router = useRouter()

@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     title: {
         flexGrow: 1,
     },
-}), { index: 1 })
+}))
 
 export default function ButtonAppBar(props) {
     const router = useRouter()
