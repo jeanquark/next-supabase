@@ -1,0 +1,43 @@
+<svg id="svg" width="800" height="600" xmlns="http://www.w3.org/2000/svg" style="">
+	<g>
+        <title>Map</title>
+        <rect id="svg_france" class="country" x="176.02041" y="97.95918" width="165.30612" height="187.7551" fill="#9a9a9a" />
+        <rect id="svg_germany" class="country" x="341.63389" y="48.97959" width="150.67993" height="180.67747" fill="#9a9a9a" />
+        <rect id="svg_switzerland" class="country" x="341.62218" y="229.38243" width="107.52581" height="80.64436" />
+        <circle cx="5" cy="5" r="4" />
+	</g>
+    <script type="text/javascript">
+    </script>
+    <style>
+        .country:hover {
+            cursor: pointer;
+            fill: #DA4567;
+        }
+        #tooltip {
+            background: cornsilk;
+            border: 1px solid black;
+            border-radius: 5px;
+            padding: 5px;
+        }
+    </style>
+</svg>
+
+<!-- <svg width="170" height="170">
+    <rect x="10" y="10" width="150" height="150" />
+
+    <style>
+        rect {
+            fill: #6e40aa;
+        }
+
+        body {
+            align-items: center;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+        }
+        .country:hover {
+            fill: #DA4567;
+        }
+    </style>
+</svg> -->

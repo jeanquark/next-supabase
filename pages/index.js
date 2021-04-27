@@ -115,6 +115,9 @@ export default function index() {
 								<Button component="a" variant="contained" color="primary">
 									enter as guest
                                 </Button>
+							</Link><br /><br />
+							<Link href="/map">
+								SVG Map
 							</Link>
 						</Grid>
 					</Grid>
