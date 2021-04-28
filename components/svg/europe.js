@@ -32,7 +32,7 @@ export default function europe({onSelectCountry}) {
                     cursor: pointer;
                 }
             `}</style>
-            <h2>Switzerland SVG map</h2><br />
+            <h2>Europe SVG map</h2><br />
             <svg id="svg" width="800" height="600" xmlns="http://www.w3.org/2000/svg" onClick={selectCountry}>
                 <g>
                     <title>Map</title>
