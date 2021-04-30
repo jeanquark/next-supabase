@@ -6,8 +6,9 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import theme from '../src/theme'
 import { Auth } from '@supabase/ui'
 import { supabase } from '../lib/initSupabase'
+import { appWithTranslation } from 'next-i18next'
 
-export default function MyApp(props) {
+const MyApp = (props) => {
     const { Component, pageProps } = props
 
     React.useEffect(() => {
@@ -39,3 +40,5 @@ MyApp.propTypes = {
     Component: PropTypes.elementType.isRequired,
     pageProps: PropTypes.object.isRequired,
 }
+
+export default appWithTranslation(MyApp)

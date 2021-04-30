@@ -1,0 +1,9 @@
+{
+    "h1": "Un exemple simple",
+    "change-locale": "Change locale",
+    "to-second-page": "Vers la deuxième page",
+    "error-with-status": "Une erreur ({{statusCode}}) est survenue au niveau du serveur",
+    "error-without-status": "Une erreur est survenue au niveau du serveur",
+    "title": "Accueil | next-i18next"
+  }
+  

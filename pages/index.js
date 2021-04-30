@@ -21,7 +21,8 @@ import Grid from '@material-ui/core/Grid'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
-
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -45,7 +46,7 @@ const fetcher = (url, token) =>
 		credentials: 'same-origin',
 	}).then((res) => res.json())
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req, locale }) {
 	// console.log('getServerSideProps req: ', req)
 	const { user } = await supabase.auth.api.getUserByCookie(req)
 	console.log('getServerSideProps user: ', user)
@@ -55,8 +56,11 @@ export async function getServerSideProps({ req }) {
 	}
 
 	// If there is a user, return it.
-	return { props: { user } }
+	return { props: { user, ...await serverSideTranslations(locale, ['common']) } }
 }
+
+
+
 
 export default function index() {
 	const classes = useStyles()
@@ -66,6 +70,7 @@ export default function index() {
 
 	const { data, error } = useSWR(session ? ['/api/getUser', session.access_token] : null, fetcher)
 	const [authView, setAuthView] = useState('sign_in')
+	const { t } = useTranslation('common')
 
 	// useEffect(() => {
 	// console.log('useEffect user.id: ', user?.id)
@@ -115,6 +120,15 @@ export default function index() {
 								<Button component="a" variant="contained" color="primary">
 									enter as guest
                                 </Button>
+							</Link>
+							<p>{t('title')}</p>
+							<Link
+								href='/'
+								locale={router.locale === 'fr' ? 'en' : 'fr'}
+							>
+								<button>
+									{t('change-locale')}
+								</button>
 							</Link>
 						</Grid>
 					</Grid>
