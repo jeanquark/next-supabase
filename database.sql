@@ -63,6 +63,8 @@ CREATE TABLE events (
   city VARCHAR(60),
   country VARCHAR(60),
   date timestamp,
+  league_id UUID,
+  round VARCHAR(60),
   inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );

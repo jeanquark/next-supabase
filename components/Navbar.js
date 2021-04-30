@@ -84,7 +84,7 @@ export default function ButtonAppBar(props) {
                     ) : (
                         <>
                             {props.links?.map((link, index) => (
-                                <Link href="/fixtures" passHref key={index}>
+                                <Link href={`/${link}`} passHref key={index}>
                                     <Button component="a" color="inherit">
                                         {link}
                                     </Button>

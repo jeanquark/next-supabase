@@ -7,7 +7,7 @@ export default async function fetchNextFixtures(req, res) {
         const data2 = await fetch("https://v3.football.api-sports.io/fixtures?from=2021-06-01&to=2021-07-31&league=4&season=2020", {
             "method": "GET",
             "headers": {
-                "x-apisports-key": process.env.NEXT_PUBLIC_API_FOOTBALL_KEY
+                "x-apisports-key": process.env.API_FOOTBALL_KEY
             }
         })
         const { response } = await data2.json()
@@ -25,6 +25,8 @@ export default async function fetchNextFixtures(req, res) {
                 venue: response[i]['fixture']['venue']['name'],
                 city: response[i]['fixture']['venue']['city'],
                 date: response[i]['fixture']['date'],
+                league_id: response[i]['league']['id'],
+                round: response[i]['league']['round'],
             })
         }
         console.log('[api/api-football/fetchNextFixtures] array: ', array)

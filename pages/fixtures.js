@@ -59,40 +59,13 @@ export default function Fixtures() {
         else setFixtures(fixtures)
     }
 
-    async function logoutHandler(e) {
-        console.log('e: ', e)
-        const { error } = await supabase.auth.signOut()
-        console.log('error: ', error)
-    }
-
     return (
         <>
-        <Head>
+            <Head>
 				<title>Fixtures</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-            {/* <AppBar position="static">
-                <Toolbar>
-                    <Typography variant="h6" className={classes.title}>
-                        Fixtures
-                    </Typography>
-                    <Link href="/"><a>Home</a></Link><br />
-                    {user ?
-                        <Box my={3}>
-                            <Button color="inherit" onClick={logoutHandler}>Logout</Button>
-                        </Box> : <Box my={3}>
-                            <Link href="/">
-                                <a>
-                                    Login
-						        </a>
-                            </Link>
-                        </Box>
-                    }
-                    user.email: {user?.email}
-
-                </Toolbar>
-            </AppBar> */}
-            <Navbar title={'Fixtures'} />
+            <Navbar title={'Fixtures'} links={['test']} />
 
             <Container className={classes.container}>
                 <Box my={5}>
