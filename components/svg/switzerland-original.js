@@ -3,69 +3,19 @@ import Link from 'next/link'
 
 export default function switzerland() {
     const [showTooltip, setShowTooltip] = useState(false)
-    const [city, setCity] = useState('')
-    function mouseOver(e) {
-        console.log('mouseOver!: ', e)
-        console.log('e.target.id: ', e.target.id)
-        setCity(e.target.id)
-        // setShowTooltip(true)
-        showPopup(e.target.id)
+    function mouseOver() {
+        console.log('mouseOver!')
+        setShowTooltip(true)
     }
     function mouseOut() {
         console.log('mouseOut!')
-        // setShowTooltip(false)
-        hidePopup()
+        setShowTooltip(false)
     }
-    const Tooltip = () => (
-        <div>tooltip {city}</div>
-    )
-    
-    function showPopup(city) {
-        console.log('showPopup: ', city)
-        var myicon = document.getElementById(city);
-        var mypopup = document.getElementById("mypopup");
-        var iconPos = myicon.getBoundingClientRect();
-        mypopup.style.left = (iconPos.right + 15) + "px";
-        mypopup.style.top = (window.scrollY + iconPos.top - 30) + "px";
-        mypopup.style.display = "block";
-    }
+    const Tooltip = () => <div>tooltip</div>
 
-    function hidePopup(evt) {
-        console.log('hidePopup: ', evt)
-        var mypopup = document.getElementById("mypopup");
-        mypopup.style.display = "none";
-    }
-    
     return (
         <>
-            <style jsx>{`
-                .city:hover {
-                    fill: #DA4567;
-                    cursor: pointer;
-                }
-                #mypopup {
-                    padding: 10px;
-                    font-family: Arial, sans-serif;
-                    background-color: white;
-                    border-radius: 6px;
-                    position: absolute;
-                    display: none;
-                }
-                #mypopup::before {
-                    content: "";
-                    width: 12px;
-                    height: 12px;
-                    transform: rotate(45deg);
-                    background-color: white;
-                    position: absolute;
-                    left: -6px;
-                    top: 28px;
-                }
-            `}</style>
             <h2>Switzerland SVG map</h2><br />
-            <div id="mypopup">
-                <p>{city}</p>
-            </div>
             <svg
                 version="1.1"
                 x="0px"
@@ -74,9 +24,10 @@ export default function switzerland() {
                 height="420px"
                 viewBox="0 0 640 420"
                 enableBackground="new 0 0 640 420"
-                id="switzerland_svg"
+                id="svg29"
+                onMouseOver={mouseOver}
+                onMouseOut={mouseOut}
             >
-                
                 <g
                     id="landmarks-switzerland">
                     <path
@@ -236,32 +187,8 @@ export default function switzerland() {
                         strokeWidth="0.75"
                         d="M374.91,256.06l-0.87,1.51l-1.74,1.45l-2.5,0.17l-0.64-0.99   l-1.51-0.64l-4.3-0.47l-1.22-0.87l-2.5-0.58l-3.08,0.58l-1.92,1.86l-0.81,1.98l0.41,2.44l-0.17,1.45l-0.7,0.87l-2.91,0.93   l-2.15,0.12l-0.93,1.98l-2.15,1.98l-0.52,1.51l-0.7,1.34l-0.93,0.29l-1.74-0.17h-2.27l-1.16-0.29l0.12,2.5l-0.06,1.69l-0.96,3.67   l3.55-1.74l2.97-0.47l2.44,0.87l1.98,3.66l0.23,1.57l-0.23,3.2v3.43v3.84l0.35,4.19l-0.47,3.2l-1.57,3.08l-1.74,2.09l-0.47,2.85   l2.09,2.85l0.76,2.21l-0.23,1.22l0.47,1.74l2.73,2.33l3.43,1.98l3.43,1.86l1.98,2.97l3.31,4.94l1.98,1.86l0.23,2.21l2.44,2.62   l1.1,2.33l1.4,0.17l1.74,0.35l1.22,1.05l1.63,0.93l2.27,0.23l1.28,0.93l0.99,0.47l1.69,0.76l3.31-2.85l2.04,1.4l1.8,0.93l1.74,1.45   l0.93-0.52l1.28-1.1l0.58-0.7l0.87,0.23l2.97,3.02l2.09,2.5l1.22,1.74l0.17,1.8l-1.1,1.22l-0.93,0.7l-0.47,0.12l-0.12,0.93   l-0.29,2.09l-0.93,0.81l-2.33,1.45l-1.45,1.28l-0.58,1.51l0.76,1.57h0.81l1.57,0.23l2.15,0.81l1.4,1.51l1.8,1.51l1.4,1.51   l1.28,0.29l1.34,0.76l0.23,1.69l0.23,3.14l1.63,2.27l0.99,1.28l0.76,0.93v1.22l0.99,2.56l1.74,2.85l-0.23,1.63l-1.57,1.45   l-1.45,2.33v1.22l0.87,0.12l1.45-1.45l1.98,0.12l1.45,1.45l1.74,0.35l1.86-0.12l1.1,0.47l0.23,1.86l1.57,0.47l2.21-1.1l0.47-2.97   l0.35-1.74l0.99-2.09l0.64-2.44l1.86-1.22l1.22-1.34l0.47-1.74l-0.47-0.35l-1.86-2.33l-1.98-1.45h-2.73l-1.22-0.99l-0.35-1.34   l0.23-1.86l-0.87-1.45l-0.99-1.22l-0.76-2.09l-0.23-0.99l0.87-1.1l1.1-1.1l1.34-0.35l0.06-1.28l-0.17-3.02l-0.64-0.76l-0.76-1.45   l0.12-2.44l0.99-2.56l1.34-0.87l2.33-0.87l2.44-0.87l1.1-0.76l0.87-1.34l0.47-1.86l-0.12-1.98l-0.99-2.09l-0.35-1.45l0.87-2.09   l3.55-1.45l2.44-2.33l1.45-1.45l1.1-0.47l1.22-2.09l1.28-0.58l-2.27-2.15l-2.38-3.37l-2.09-1.98l-2.85-2.09l-0.47-2.21l0.47-2.97   l-1.1-2.97l-1.74-2.97l-0.76-2.09l0.99-1.74l0.99-2.85l-0.12-3.08l0.64-1.74l1.34-1.1l1.22-1.98l-0.64-3.37l0.12-2.5l0.87-2.33   l0.35-1.74l-1.63-1.98l-0.47-1.98l1.1-2.21l0.29-3.08l-1.92-2.15l-2.04-0.64l-1.28-0.12l-1.92-1.92l-1.4-2.15l-1.57-3.61   l-0.23-2.91l0.47-4.19l1.28-0.93l1.74-1.86l-0.35-1.22l-0.58-0.35l-2.27-0.52l-1.8-2.33l-1.1-1.1l-2.62,0.76l-2.21-0.23l-0.35-1.4   l-0.23-1.86l-0.29-2.73l-0.35-1.86l-0.41,0.47l-0.99,0.7l-3.43,0.29l-1.92,1.51l-0.64,1.4l1.16,2.33l0.47,0.99l-0.06,1.51   l-1.45,1.4l-1.57,1.1l-1.57,0.7l-2.27,0.41l-2.27,0.58h-1.16l-0.87-0.47l-2.21,1.63l-1.98-0.35l-1.92-1.1l-1.34-0.7l-2.68-0.47   l-2.09,0.47l-2.09-0.12l-2.38-1.1L374.91,256.06L374.91,256.06z M413.41,368.76l0.64,0.64l0.64-0.12l0.47-0.64l0.47-0.76   l-0.12-0.93l-0.47-0.17l-0.99,0.99L413.41,368.76L413.41,368.76z" />
                 </g>
-                <g pointerEvents="all">
-                    <circle
-                        id="lausanne"
-                        fill="#FF0000"
-                        cx="96.571426"
-                        cy="274.85715"
-                        r="4.5714288"
-                        className="city"
-                        onMouseOver={mouseOver}
-                        onMouseOut={mouseOut}
-                    />
-                    <circle
-                        id="zurich"
-                        fill="#FF0000"
-                        cx="370.85715"
-                        cy="100.57143"
-                        r="4.5714288"
-                        className="city"
-                        onMouseOver={mouseOver}
-                        onMouseOut={mouseOut}
-                    />
-                </g>
-
-
-                
             </svg>
+            {showTooltip ? <Tooltip /> : null}
         </>
     )
 }

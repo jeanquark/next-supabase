@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-// import Europe from '../components/svg/europe'
 import dynamic from 'next/dynamic'
 import Button from '@material-ui/core/Button'
+import ToucanUIButton from '../components/ui/Button'
+
 
 export default function map() {
     const [country, setCountry] = useState('europe')
@@ -16,20 +17,24 @@ export default function map() {
         loading: () => <p>Loading...</p>,
     });
 
-    function handleSelectCountry(e) {
-        console.log('[parent] handleSelectCountry: ', e)
+    function handleSelectCountry(countryName) {
+        console.log('[parent] handleSelectCountry: ', countryName)
+        setCountry(countryName)
     }
-    
+
     const DynamicComponent = getDynamicComponent(country);
     return (
         <>
             <h2>SVG Map</h2><br />
-            <Link href="/">Home</Link><br />
+            <Link href="/">Home</Link><br /><br />
+            <ToucanUIButton text={"Back to Europe"} size={"small"} color={"#12824C"} handleClick={() => toggleMap('europe')} />
             <Button variant="contained" color="primary" size="small" onClick={() => toggleMap('switzerland')}>Switzerland</Button>
             <Button variant="contained" color="secondary" size="small" onClick={() => toggleMap('germany')}>Germany</Button>
+
+
             {/* <Europe onSelectCountry={handleSelectCountry} /> */}
             {/* <Europe /> */}
-            <DynamicComponent />
+            <DynamicComponent onSelectCountry={handleSelectCountry} />
 
         </>
     )
