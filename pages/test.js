@@ -50,7 +50,7 @@ export default function Test() {
 				<title>Fixtures</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<Navbar title={'Test'} links={['fixtures']} />
+			<Navbar title={'Test'} links={['fixtures', 'actions']} />
 
 			<Container className={classes.container}>
 				<Button variant="contained" color="secondary" size="small" onClick={() => fetchEuro2020Fixtures()}>Fetch Euro 2020 fixtures</Button>
