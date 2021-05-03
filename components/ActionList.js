@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { supabase } from '../lib/initSupabase'
 import { makeStyles } from '@material-ui/core/styles'
 import { Auth } from '@supabase/ui'
+import Countdown from 'react-countdown'
 import Moment from 'react-moment'
 import { Grid, TextField, Button, Paper, Box } from '@material-ui/core'
 
@@ -33,9 +34,21 @@ export default function Messages() {
     const [actions, setActions] = useState([])
     const [newAction, handleNewAction] = useState('')
     const [updateAction, handleUpdateAction] = useState('')
+    const [deleteAction, handleDeleteAction] = useState('')
     const [error, setError] = useState('')
     const actionsEndRef = useRef(null)
     let mySubscription = null
+
+    useEffect(() => {
+        console.log('[useEffect] id: ', id)
+        if (id != undefined) {
+            getActionsAndSubscribe(id)
+        }
+        return () => {
+            supabase.removeSubscription(mySubscription)
+            console.log('Remove supabase subscription by useEffect unmount')
+        }
+    }, [id])
 
     useEffect(() => {
         console.log('[useEffect] newAction: ', newAction)
@@ -50,10 +63,11 @@ export default function Messages() {
             console.log('[useEffect] updateAction: ', updateAction)
             console.log('actions: ', actions)
             if (updateAction) {
-                const index = actions.findIndex(a => a.id == updateAction.id)
+                const index = actions.findIndex((a) => a.id == updateAction.id)
                 console.log('index: ', index)
                 let newActions = [...actions]
                 newActions[index]['number_participants'] = updateAction.number_participants
+                newActions[index]['is_completed'] = updateAction.is_completed
                 setActions(newActions)
             }
         } catch (error) {
@@ -62,26 +76,28 @@ export default function Messages() {
     }, [updateAction])
 
     useEffect(() => {
-        console.log("[useEffect] id: ", id)
-        if (id != undefined) {
-            getActionsAndSubscribe(id)
+        console.log('[useEffect] deleteAction: ', deleteAction)
+        if (deleteAction) {
+            setActions(actions.filter(a => a.id !== deleteAction.id))
         }
-        return () => {
-            supabase.removeSubscription(mySubscription)
-            console.log('Remove supabase subscription by useEffect unmount')
-        }
-    }, [id])
+    }, [deleteAction])
+    
 
     // const handleCreateAction = (newAction) => {
     //     console.log('handleCreateAction: newAction: ', newAction)
     //     setActions((a) => [...a, newAction])
     // }
+    const onCountdownComplete = (action) => {
+        console.log('onCountdownComplete: ', action)
+        // Delete from store
+        handleDeleteAction(action)
+    }
 
     const handleUpdateAction2 = (updatedAction) => {
         // function handleUpdateAction (updatedAction) {
         console.log('handleUpdateAction: updatedAction', updatedAction)
         setActions((actions) => {
-            actions.map(x => {
+            actions.map((x) => {
                 console.log('x: ', x)
             })
         })
@@ -101,13 +117,12 @@ export default function Messages() {
         //     // return { ...x }
         // }))
 
-
-        // let updatedList = state.todos.map(item => 
+        // let updatedList = state.todos.map(item =>
         //     {
         //       if (item.id == 1){
         //         return {...item, done: !item.done}; //gets everything that was already in item, and updates "done"
         //       }
-        //       return item; // else return unmodified item 
+        //       return item; // else return unmodified item
         //     });
 
         //   setActions({todos: updatedList}); // set state to new object with updated list
@@ -119,11 +134,14 @@ export default function Messages() {
         // newArr[index] = e.target.value; // replace e.target.value with whatever you want to change it to
     }
 
-
     const getInitialActions = async (id) => {
         console.log('getInitialActions')
         if (!actions.length) {
-            const { data, error } = await supabase.from(`event_actions`).select(`id, number_participants, participation_threshold, events (home_team_name, visitor_team_name), actions (name), users (id, full_name)`).eq('event_id', id).order('id', { ascending: true })
+            const { data, error } = await supabase
+                .from(`event_actions`)
+                .select(`id, number_participants, participation_threshold, is_completed, expired_at, events (home_team_name, visitor_team_name), actions (name), users (id, full_name)`)
+                .eq('event_id', id)
+                .order('id', { ascending: true })
             if (error) {
                 setError(error.message)
                 supabase.removeSubscription(mySubscription)
@@ -155,7 +173,6 @@ export default function Messages() {
             console.log('Delete message')
         }
     }
-
 
     const scrollToBottom = () => {
         console.log('scrollToBottom')
@@ -192,13 +209,29 @@ export default function Messages() {
         <>
             <h1 style={{ textAlign: 'center' }}>Actions:</h1>
             <br />
-            <Button variant="contained" color="primary" size="small" onClick={() => { createAction() }}>Create new action</Button>
+            <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => {
+                    createAction()
+                }}
+            >
+                Create new action
+            </Button>
+            <br />
+            <Countdown date={Date.now() + 10000} onComplete={() => onCountdownComplete()} />
             <br />
             <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
                 {actions.map((action) => (
                     <Box key={action.id}>
                         <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
-                            Action <i>{action.actions?.name}</i> on event <i>{action.events?.home_team_name} - {action.events?.visitor_team_name}</i> by user <i>{action.users?.id}</i> Participants: {action.number_participants} <button onClick={() => joinAction(action.id)}>Participate</button>
+                            Action <i>{action.actions?.name}</i> on event{' '}
+                            <i>
+                                {action.events?.home_team_name} - {action.events?.visitor_team_name}
+                            </i>{' '}
+                            by user <i>{action.users?.id}</i> Participants: {action.number_participants} isCompleted? {action.is_completed ? 'Yes' : 'No'} expiredAt: {action.expired_at} expiresIn: <Countdown date={action.expired_at} onComplete={() => onCountdownComplete(action)} />&nbsp;
+                            <button onClick={() => joinAction(action.id)}>Participate</button>
                         </Paper>
                     </Box>
                 ))}
