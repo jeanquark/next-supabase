@@ -38,13 +38,13 @@ export default function Actions() {
         getInitialActions()
         console.log('getMessagesAndSubscribe')
         if (!mySubscription) {
-            mySubscription = supabase
-                .from(`event_actions`)
-                .on('*', (payload) => {
-                    console.log('getActionsAndSubscribe payload: ', payload)
-                    setNewAction(payload.new)
-                })
-                .subscribe()
+            // mySubscription = supabase
+            //     .from(`event_actions`)
+            //     .on('*', (payload) => {
+            //         console.log('getActionsAndSubscribe payload: ', payload)
+            //         setNewAction(payload.new)
+            //     })
+            //     .subscribe()
         } else {
             console.log('Delete action')
         }

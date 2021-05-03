@@ -38,19 +38,19 @@ const Event = () => {
 	// 	}
 	// }, [])
 
-    useEffect(() => {
-        fetchEvent(id)
-    }, [id])
+    // useEffect(() => {
+    //     fetchEvent(id)
+    // }, [id])
 
-    const fetchEvent = async (id) => {
-        let { data: event, error } = await supabase.from('events').select('*').eq('id', id)
-        if (error) {
-            console.log('error', error)
-        } else {
-            console.log('event[0]: ', event[0])
-            setEvent(event[0])
-        }
-    }
+    // const fetchEvent = async (id) => {
+    //     let { data: event, error } = await supabase.from('events').select('*').eq('id', id)
+    //     if (error) {
+    //         console.log('error', error)
+    //     } else {
+    //         console.log('event[0]: ', event[0])
+    //         setEvent(event[0])
+    //     }
+    // }
 
     async function logoutHandler(e) {
         console.log('e: ', e)

@@ -180,7 +180,7 @@ export default function Messages() {
                 alert(error.message)
                 return
             }
-            console.log('Sucsessfully sent!')
+            console.log('Successfully sent!')
             setMessage('')
         } catch (error) {
             console.log('error sending message:', error)
