@@ -44,9 +44,16 @@ export default function Messages() {
         if (id != undefined) {
             getActionsAndSubscribe(id)
         }
-        return () => {
-            supabase.removeSubscription(mySubscription)
-            console.log('Remove supabase subscription by useEffect unmount')
+        return async () => {
+            const { data } = await supabase.removeSubscription(mySubscription)
+            // Remove user from event
+            await supabase
+                .from('user_event')
+                .upsert(
+                    { user_id: 1, event_id: null },
+                    { onConflict: 'user_id' }
+                )
+            console.log('Remove supabase subscription by useEffect unmount. data: ', data)
         }
     }, [id])
 
@@ -83,55 +90,10 @@ export default function Messages() {
     }, [deleteAction])
     
 
-    // const handleCreateAction = (newAction) => {
-    //     console.log('handleCreateAction: newAction: ', newAction)
-    //     setActions((a) => [...a, newAction])
-    // }
     const onCountdownComplete = (action) => {
         console.log('onCountdownComplete: ', action)
         // Delete from store
         handleDeleteAction(action)
-    }
-
-    const handleUpdateAction2 = (updatedAction) => {
-        // function handleUpdateAction (updatedAction) {
-        console.log('handleUpdateAction: updatedAction', updatedAction)
-        setActions((actions) => {
-            actions.map((x) => {
-                console.log('x: ', x)
-            })
-        })
-        // setActions((a) => [...a])
-        // const newClicks = [...actions];
-        // console.log('newClicks: ', newClicks)
-        // const index = this.actions.findIndex(action => action.id == 2)
-        // console.log('index: ', index)
-
-        // setActions(actions.map(x => {
-        //     if(x.id !== 2) return x
-        //     return {...x}
-        //     // if (x.id === updatedAction.id) {
-        //     //     console.log('Update number_participants for item ', x.id)
-        //     //     // x.number_participants = updatedAction.number_participants
-        //     // }
-        //     // return { ...x }
-        // }))
-
-        // let updatedList = state.todos.map(item =>
-        //     {
-        //       if (item.id == 1){
-        //         return {...item, done: !item.done}; //gets everything that was already in item, and updates "done"
-        //       }
-        //       return item; // else return unmodified item
-        //     });
-
-        //   setActions({todos: updatedList}); // set state to new object with updated list
-
-        // console.log('[...actions]: ', [...actions])
-        // setActions((a) => [...a, {}])
-
-        // let newArr = [...datas]; // copying the old datas array
-        // newArr[index] = e.target.value; // replace e.target.value with whatever you want to change it to
     }
 
     const getInitialActions = async (id) => {
@@ -149,6 +111,14 @@ export default function Messages() {
                 return
             }
             setActions(data)
+            
+            // Add user to event
+            await supabase
+                .from('user_event')
+                .upsert(
+                    { user_id: 1, event_id: id },
+                    { onConflict: 'user_id' }
+                )
         }
     }
     const getActionsAndSubscribe = async (id) => {

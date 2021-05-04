@@ -30,6 +30,76 @@ const Event = () => {
     const classes = useStyles()
     const { user, session } = Auth.useUser()
     const [event, setEvent] = useState([])
+    // const [error, setError] = useState('')
+    // let mySubscription = null
+
+    // useEffect(() => {
+    //     console.log('[useEffect] id: ', id)
+    //     if (id != undefined) {
+    //         getActionsAndSubscribe(id)
+    //     }
+    //     return async () => {
+    //         const { data } = await supabase.removeSubscription(mySubscription)
+    //         // Remove user from event
+    //         await supabase
+    //             .from('user_event')
+    //             .upsert(
+    //                 { user_id: 1, event_id: null },
+    //                 { onConflict: 'user_id' }
+    //             )
+    //         console.log('Remove supabase subscription by useEffect unmount. data: ', data)
+
+    //     }
+    // }, [id])
+
+    // const getInitialActions = async (id) => {
+    //     console.log('getInitialActions')
+    //     if (!actions.length) {
+    //         const { data, error } = await supabase
+    //             .from(`event_actions`)
+    //             .select(`id, number_participants, participation_threshold, is_completed, expired_at, events (home_team_name, visitor_team_name), actions (name), users (id, full_name)`)
+    //             .eq('event_id', id)
+    //             .order('id', { ascending: true })
+    //         if (error) {
+    //             setError(error.message)
+    //             supabase.removeSubscription(mySubscription)
+    //             mySubscription = null
+    //             return
+    //         }
+    //         setActions(data)
+            
+    //         // Add user to event
+    //         await supabase
+    //             .from('user_event')
+    //             .upsert(
+    //                 { user_id: 1, event_id: id },
+    //                 { onConflict: 'user_id' }
+    //             )
+    //     }
+    // }
+
+    // const getActionsAndSubscribe = async (id) => {
+    //     console.log('getActionsAndSubscribe')
+    //     setError('')
+    //     getInitialActions(id)
+    //     if (!mySubscription) {
+    //         mySubscription = supabase
+    //             .from(`event_actions:event_id=eq.${id}`)
+    //             .on('INSERT', (payload) => {
+    //                 console.log('INSERT')
+    //                 handleNewAction(payload.new)
+    //                 // handleCreateAction(payload.new)
+    //             })
+    //             .on('UPDATE', (payload) => {
+    //                 console.log('UPDATE')
+    //                 handleUpdateAction(payload.new)
+    //             })
+    //             .subscribe()
+    //     } else {
+    //         supabase.removeSubscription(mySubscription)
+    //         console.log('Delete message')
+    //     }
+    // }
 
     // useEffect(() => {
 	// 	console.log('useEffect user.id: ', user?.id)
@@ -65,7 +135,7 @@ const Event = () => {
             <Container className={classes.container}>
                 <Grid container spacing={0}>
                     <Grid item xs={12} sm={6}>
-                        <EventDetails event={event} />
+                        <EventDetails />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         {/* <MessageList /> */}
