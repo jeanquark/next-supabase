@@ -6,7 +6,7 @@ import ToucanUIButton from '../components/ui/Button'
 
 
 export default function map() {
-    const [country, setCountry] = useState('europe-highcharts')
+    const [country, setCountry] = useState('europe-uefa-euro2020')
 
     function toggleMap(countryName) {
         console.log('toggleMap countryName: ', countryName)
@@ -27,14 +27,16 @@ export default function map() {
         <>
             <h2>SVG Map</h2><br />
             <Link href="/">Home</Link><br /><br />
-            <ToucanUIButton text={"Back to Europe"} size={"small"} color={"#12824C"} handleClick={() => toggleMap('europe-highcharts')} />
-            <Button variant="contained" color="primary" size="small" onClick={() => toggleMap('switzerland')}>Switzerland</Button>
+            <ToucanUIButton text={"Back to Europe"} size={"small"} color={"#12824C"} handleClick={() => toggleMap('europe-euro2020')} />
+            <Button variant="contained" color="primary" size="small" onClick={() => toggleMap('switzerland-highcharts')}>Switzerland</Button>
             <Button variant="contained" color="secondary" size="small" onClick={() => toggleMap('germany')}>Germany</Button>
 
 
             {/* <Europe onSelectCountry={handleSelectCountry} /> */}
             {/* <Europe /> */}
-            <DynamicComponent onSelectCountry={handleSelectCountry} />
+            {/* <div style={{ border: '2px solid red' }}> */}
+                <DynamicComponent onSelectCountry={handleSelectCountry} style={{}}/>
+            {/* </div> */}
 
         </>
     )
