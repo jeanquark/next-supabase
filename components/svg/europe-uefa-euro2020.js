@@ -6,52 +6,110 @@ export default function europe({ onSelectCountry }) {
     const [stadiums, setStadiums] = useState({})
     const [stadium, setStadium] = useState({})
 
-    const fetchStadium = async (stadiumSlug) => {
+    useEffect(async () => {
+        console.log('[useEffect] stadiums: ', stadiums)
+        // let { data, error } = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', 700)
+        // if (error) console.log('error', error)
+        // else {
+        //     setStadiums({
+        //         [700]: { ...stadiums[700], fixtures: 'abc' }
+        //     })
+        // }
+    }, [stadiums])
+
+    const fetchStadium = async (stadiumId) => {
         try {
-            console.log('fetchStadium ', stadiumSlug)
-            let { data, error } = await supabase.from('stadiums').select('*').eq('slug', stadiumSlug)
-            if (error) console.log('error', error)
-            else {
-                console.log('data: ', data[0])
-                setStadium(data[0])
-                setStadiums({
-                    ...stadiums,
-                    [data[0]['slug']]: data[0]
-                })
+            console.log('fetchStadium ', stadiumId)
+            let { data, error } = await supabase.from('stadiums').select('*').eq('api_football_id', stadiumId)
+            if (error) {
+                console.log('error', error)
+                throw error
             }
+            console.log('data: ', data[0])
+            setStadiums({
+                ...stadiums,
+                [data[0]['api_football_id']]: data[0]
+            })
+            setStadium({
+                ...data[0]
+            })
+
+            // let data2 = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', stadiumId)
+            // console.log('data2: ', data2)
+            // setStadiums({
+            //     [stadiumId]: { ...stadiums[stadiumId], fixtures: 'abc' }
+            // })
+            console.log('fetchStadium done! stadiums: ', stadiums)
         } catch (error) {
             console.log('error: ', error)
         }
     }
 
-    function selectCountry(e) {
-        console.log('[child] selectCountry: ', e)
-        console.log('[child] selectCountry.target.id: ', e.target.id)
-        onSelectCountry(e.target.id)
-    }
-    function mouseOver(e) {
-        console.log('mouseOver!: ', e)
-        // console.log('e.target.id: ', e.target.id)
-        // setStadium(e.target.id)
-        const stadiumSlug = e.target.id
-        showPopup(stadiumSlug)
-        const { clientX, clientY } = e
-        console.log('clientX: ', clientX)
-        console.log('clientY: ', clientY)
-        if (clientX > 600) {
-            document.getElementById("mypopup").className += " float-left"
-        } else {
-            document.getElementById("mypopup").classList.remove("float-left")
+    const fetchEventsByStadium = async (stadiumId) => {
+        try {
+            console.log('fetchEventsByStadium. stadiumId: ', stadiumId)
+            console.log('fetchEventsByStadium. stadiums: ', stadiums)
+            let { data, error } = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', stadiumId)
+            if (error) console.log('error', error)
+            else {
+                console.log('data2: ', data)
+                let array
+                // for (let i = 0; data.length; i++) {
+                //     console.log('data[i]: ', data[i])
+
+                //     // setStadiums({...stadiums, Granulocytes : {
+                //         //     ...appointmentType.Granulocytes, 
+                //         //     [e.target.id] : e.target.value}
+                //         // })
+                // }
+                // console.log('stadiums[stadiumId]: ', stadiums[stadiumId])
+                // let newObject = {
+                //     ...stadiums[stadiumId],
+                //     // fixtures: 'abc'
+                // }
+                // console.log('newObject: ', newObject)
+
+                // setStadiums({
+                //     ...stadiums,
+                //     // [stadiumId]: { ...stadiums[stadiumId], fixtures: 'abc' }
+                //     // [700]: 'abc'
+                //     // [700]: { ...stadiums[700], fixtures: data }
+                //     // [stadiumId]: [ ...stadiums[stadiumId], {fixtures: 'abc' }]
+                // })
+
+            }
+        } catch (error) {
+
         }
-        
-        // Check if data is in local store
-        if (!stadiums[stadiumSlug]) {
-            fetchStadium(stadiumSlug)
-        } else { // If not, send API request to retrieve stadium info
-            setStadium(stadiums[stadiumSlug])
+    }
+
+    async function mouseOver(e) {
+        try {
+            console.log('mouseOver!: ', e)
+            const stadiumId = e.target.id
+            showPopup(stadiumId)
+            const { clientX, clientY } = e
+            console.log('clientX: ', clientX)
+            console.log('clientY: ', clientY)
+            if (clientX > 600) {
+                document.getElementById("mypopup").className += " float-left"
+            } else {
+                document.getElementById("mypopup").classList.remove("float-left")
+            }
+
+            // Check if data is in local store. If not, send API request to retrieve stadium info
+            if (!stadiums[stadiumId]) {
+                await fetchStadium(stadiumId)
+                // await fetchEventsByStadium(stadiumId)
+            // }
+            } else { // If not, send API request to retrieve stadium info
+                setStadium(stadiums[stadiumId])
+            }
+        } catch (error) {
+            console.log('error: ', error)
         }
 
-        
+
 
     }
     function mouseOut() {
@@ -61,9 +119,9 @@ export default function europe({ onSelectCountry }) {
         hidePopup()
     }
 
-    function showPopup(stadium) {
-        console.log('showPopup: ', stadium)
-        var myicon = document.getElementById(stadium);
+    function showPopup(stadiumId) {
+        console.log('showPopup. stadiumId: ', stadiumId)
+        var myicon = document.getElementById(stadiumId);
         var mypopup = document.getElementById("mypopup");
         var iconPos = myicon.getBoundingClientRect();
         mypopup.style.left = (iconPos.right + 15) + "px";
@@ -111,7 +169,8 @@ export default function europe({ onSelectCountry }) {
             <h2>Europe SVG map</h2><br />
             <div id="mypopup" className="">
                 <p>
-                    {stadium.id} - {stadium.name}, {stadium.city}, {stadium.country}
+                    {stadium?.id}
+                    - {stadium.name}, {stadium.city}, {stadium.country}
                 </p>
             </div>
 
@@ -1047,15 +1106,17 @@ export default function europe({ onSelectCountry }) {
 
                     <circle
                         fill="#ff0000"
-                        id="allianz_arena"
+                        id="700"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
                         cx="606.10382"
                         cy="596.91144"
-                        r="3.5200067">
+                        r="5">
                         <desc>
                             <name>Allianz Arena</name>
+                            <slug>allianz_arena</slug>
+                            <football_api_id>700</football_api_id>
                             <city>Munich</city>
                             <country>Germany</country>
                             <continent>Europe</continent>
@@ -1063,31 +1124,183 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#ff0000"
-                        id="olympic_stadium"
+                        id="2607"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
                         cx="1088.6514"
                         cy="586.61664"
-                        r="3.5200067" />
+                        r="5">
+                        <desc>
+                            <name>Olympic Stadium</name>
+                            <slug>olympic_stadium</slug>
+                            <football_api_id>2607</football_api_id>
+                            <city>Baku</city>
+                            <country>Azerbaijan</country>
+                            <continent>Europe</continent>
+                        </desc></circle>
                     <circle
                         fill="#ff0000"
-                        id="la_cartuja"
+                        id=""
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
                         cx="360.05472"
                         cy="754.70868"
-                        r="3.5200067" />
+                        r="5">
+                        <desc>
+                            <name>La Cartuja</name>
+                            <slug>la_cartuja</slug>
+                            <football_api_id></football_api_id>
+                            <city>Seville</city>
+                            <country>Spain</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
                     <circle
                         fill="#ff0000"
-                        id="krestovsky_stadium"
+                        id=""
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
                         cx="761.38043"
                         cy="366.11151"
-                        r="3.5200067" />
+                        r="5">
+                        <desc>
+                            <name>Krestovsky Stadium</name>
+                            <slug>krestovsky_stadium</slug>
+                            <football_api_id></football_api_id>
+                            <city>Saint Petersburg</city>
+                            <country>Russia</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
+                    <circle
+                        fill="#ff0000"
+                        id=""
+                        className="stadium"
+                        onMouseOver={mouseOver}
+                        onMouseOut={mouseOut}
+                        cx="689.93719"
+                        cy="602.69989"
+                        r="5">
+                        <desc>
+                            <name>Puskás Aréna</name>
+                            <slug>puskas_arena</slug>
+                            <football_api_id></football_api_id>
+                            <city>Budapest</city>
+                            <country>Hungary</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
+                    <circle
+                        fill="#ff0000"
+                        id="1326"
+                        className="stadium"
+                        onMouseOver={mouseOver}
+                        onMouseOut={mouseOut}
+                        cx="785.2287"
+                        cy="634.65594"
+                        r="5">
+                        <desc>
+                            <name>Arena Națională</name>
+                            <slug>arena_nationala</slug>
+                            <football_api_id>1326</football_api_id>
+                            <city>Bucharest</city>
+                            <country>Romania</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
+                    <circle
+                        fill="#ff0000"
+                        id="910"
+                        className="stadium"
+                        onMouseOver={mouseOver}
+                        onMouseOut={mouseOut}
+                        cx="620.38275"
+                        cy="706.94879"
+                        r="5">
+                        <desc>
+                            <name>Stadio Olimpico</name>
+                            <slug>stadio_olimpico</slug>
+                            <football_api_id>910</football_api_id>
+                            <city>Rome</city>
+                            <country>Italy</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
+                    <circle
+                        fill="#ff0000"
+                        id="1117"
+                        className="stadium"
+                        onMouseOver={mouseOver}
+                        onMouseOut={mouseOut}
+                        cx="531.93719"
+                        cy="522.76239"
+                        r="5">
+                        <desc>
+                            <name>Johan Cruyff Arena</name>
+                            <slug>johan_cruyff_arena</slug>
+                            <football_api_id>1117</football_api_id>
+                            <city>Amsterdam</city>
+                            <country>The Netherlands</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
+                    <circle
+                        fill="#ff0000"
+                        id="439"
+                        className="stadium"
+                        onMouseOver={mouseOver}
+                        onMouseOut={mouseOut}
+                        cx="608.80334"
+                        cy="465.72501"
+                        r="5">
+                        <desc>
+                            <name>Parken Stadium</name>
+                            <slug>parken_stadium</slug>
+                            <football_api_id>439</football_api_id>
+                            <city>Copenhagen</city>
+                            <country>Denmark</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
+                    <circle
+                        fill="#ff0000"
+                        id="2617"
+                        className="stadium"
+                        onMouseOver={mouseOver}
+                        onMouseOut={mouseOut}
+                        cx="448.34503"
+                        cy="447.68527"
+                        r="5">
+                        <desc>
+                            <name>Hampden Park</name>
+                            <slug>hampden_park</slug>
+                            <football_api_id>2617</football_api_id>
+                            <city>Glasgow</city>
+                            <country>United Kingdom</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
+                    <circle
+                        fill="#ff0000"
+                        id="489"
+                        className="stadium"
+                        onMouseOver={mouseOver}
+                        onMouseOut={mouseOut}
+                        cx="476.5033"
+                        cy="531.06641"
+                        r="5">
+                        <desc>
+                            <name>Wembley Stadium</name>
+                            <slug>wembley_stadium</slug>
+                            <football_api_id>489</football_api_id>
+                            <city>London</city>
+                            <country>United Kingdom</country>
+                            <continent>Europe</continent>
+                        </desc>
+                    </circle>
                 </g>
             </svg>
         </>

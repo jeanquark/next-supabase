@@ -40,9 +40,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2"
-     inkscape:cx="295.61102"
-     inkscape:cy="512.33088"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="572.89905"
+     inkscape:cy="375.33639"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:window-width="1920"
@@ -419,6 +419,48 @@
        id="saint_petersburg"
        cx="761.38043"
        cy="366.11151"
+       r="3.5200067" />
+    <circle
+       style="fill:#ff0000"
+       id="munich-5"
+       cx="689.93719"
+       cy="602.69989"
+       r="3.5200067" />
+    <circle
+       style="fill:#ff0000"
+       id="munich-8"
+       cx="785.2287"
+       cy="634.65594"
+       r="3.5200067" />
+    <circle
+       style="fill:#ff0000"
+       id="munich-6"
+       cx="620.38275"
+       cy="706.94879"
+       r="3.5200067" />
+    <circle
+       style="fill:#ff0000"
+       id="munich-1"
+       cx="531.93719"
+       cy="522.76239"
+       r="3.5200067" />
+    <circle
+       style="fill:#ff0000"
+       id="munich-4"
+       cx="608.80334"
+       cy="465.72501"
+       r="3.5200067" />
+    <circle
+       style="fill:#ff0000"
+       id="munich-2"
+       cx="448.34503"
+       cy="447.68527"
+       r="3.5200067" />
+    <circle
+       style="fill:#ff0000"
+       id="munich-61"
+       cx="476.5033"
+       cy="531.06641"
        r="3.5200067" />
   </g>
 </svg>

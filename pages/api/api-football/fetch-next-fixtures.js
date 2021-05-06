@@ -22,7 +22,10 @@ export default async function fetchNextFixtures(req, res) {
                 visitor_team_id: response[i]['teams']['away']['id'],
                 visitor_team_name: response[i]['teams']['away']['name'],
                 visitor_team_image: response[i]['teams']['away']['logo'],
-                venue: response[i]['fixture']['venue']['name'],
+                league_name: response[i]['fixture']['league']['name'],
+                league_id: response[i]['fixture']['league']['id'],
+                venue_name: response[i]['fixture']['venue']['name'],
+                venue_id: response[i]['fixture']['venue']['id'],
                 city: response[i]['fixture']['venue']['city'],
                 date: response[i]['fixture']['date'],
             })
