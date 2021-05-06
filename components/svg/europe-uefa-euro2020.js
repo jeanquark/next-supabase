@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/initSupabase'
+import { Box, Avatar } from '@material-ui/core'
 
 export default function europe({ onSelectCountry }) {
     const [showTooltip, setShowTooltip] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [stadiums, setStadiums] = useState({})
     const [stadium, setStadium] = useState({})
 
@@ -19,67 +21,35 @@ export default function europe({ onSelectCountry }) {
 
     const fetchStadium = async (stadiumId) => {
         try {
+            setLoading(true)
             console.log('fetchStadium ', stadiumId)
-            let { data, error } = await supabase.from('stadiums').select('*').eq('api_football_id', stadiumId)
-            if (error) {
-                console.log('error', error)
-                throw error
+            const { data: stadiumDetails, error: error1 } = await supabase.from('stadiums').select('*').eq('api_football_id', stadiumId)
+            if (error1) {
+                console.log('error1 ', error1)
+                throw error1
             }
-            console.log('data: ', data[0])
+
+            const { data: stadiumFixtures, error: error2 } = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', stadiumId)
+            if (error2) {
+                console.log('error2 ', error2)
+                throw error2
+            }
+
+            let obj = { ...stadiumDetails[0] }
+            obj['fixtures'] = stadiumFixtures
+            console.log('obj: ', obj)
+
             setStadiums({
                 ...stadiums,
-                [data[0]['api_football_id']]: data[0]
+                [obj['api_football_id']]: obj
             })
             setStadium({
-                ...data[0]
+                ...obj
             })
-
-            // let data2 = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', stadiumId)
-            // console.log('data2: ', data2)
-            // setStadiums({
-            //     [stadiumId]: { ...stadiums[stadiumId], fixtures: 'abc' }
-            // })
+            setLoading(false)
             console.log('fetchStadium done! stadiums: ', stadiums)
         } catch (error) {
             console.log('error: ', error)
-        }
-    }
-
-    const fetchEventsByStadium = async (stadiumId) => {
-        try {
-            console.log('fetchEventsByStadium. stadiumId: ', stadiumId)
-            console.log('fetchEventsByStadium. stadiums: ', stadiums)
-            let { data, error } = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', stadiumId)
-            if (error) console.log('error', error)
-            else {
-                console.log('data2: ', data)
-                let array
-                // for (let i = 0; data.length; i++) {
-                //     console.log('data[i]: ', data[i])
-
-                //     // setStadiums({...stadiums, Granulocytes : {
-                //         //     ...appointmentType.Granulocytes, 
-                //         //     [e.target.id] : e.target.value}
-                //         // })
-                // }
-                // console.log('stadiums[stadiumId]: ', stadiums[stadiumId])
-                // let newObject = {
-                //     ...stadiums[stadiumId],
-                //     // fixtures: 'abc'
-                // }
-                // console.log('newObject: ', newObject)
-
-                // setStadiums({
-                //     ...stadiums,
-                //     // [stadiumId]: { ...stadiums[stadiumId], fixtures: 'abc' }
-                //     // [700]: 'abc'
-                //     // [700]: { ...stadiums[700], fixtures: data }
-                //     // [stadiumId]: [ ...stadiums[stadiumId], {fixtures: 'abc' }]
-                // })
-
-            }
-        } catch (error) {
-
         }
     }
 
@@ -92,9 +62,11 @@ export default function europe({ onSelectCountry }) {
             console.log('clientX: ', clientX)
             console.log('clientY: ', clientY)
             if (clientX > 600) {
+                document.getElementById("mypopup").classList.remove("float-right")
                 document.getElementById("mypopup").className += " float-left"
             } else {
                 document.getElementById("mypopup").classList.remove("float-left")
+                document.getElementById("mypopup").className += " float-right"
             }
 
             // Check if data is in local store. If not, send API request to retrieve stadium info
@@ -145,9 +117,10 @@ export default function europe({ onSelectCountry }) {
                     fill: "#000000";
                 }
                 #mypopup {
+                    width: 240px;
                     padding: 10px;
                     font-family: Arial, sans-serif;
-                    background-color: white;
+                    background-color: orange;
                     border-radius: 6px;
                     position: absolute;
                     display: none;
@@ -156,22 +129,38 @@ export default function europe({ onSelectCountry }) {
                     content: "";
                     width: 12px;
                     height: 12px;
-                    transform: rotate(45deg);
-                    background-color: white;
+                    background-color: grey;
                     position: absolute;
                     left: -6px;
                     top: 28px;
                 }
                 .float-left {
-                    transform: translate(-300px, 0px);
+                    transform: translate(-280px, 0px);
                 }
+                .float-left::before {
+                    transform: translate(240px, 0px) rotate(45deg) ;
+                }
+                .float-right::before {
+                    transform: rotate(45deg);
+                }
+                .avatar: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                },
             `}</style>
             <h2>Europe SVG map</h2><br />
             <div id="mypopup" className="">
-                <p>
-                    {stadium?.id}
-                    - {stadium.name}, {stadium.city}, {stadium.country}
-                </p>
+                {!loading ? <p>
+                    ID {stadium.id}, {stadium.name}, {stadium.city}, {stadium.country}
+                </p> : <p>loading...</p>}
+                {stadium.fixtures?.map((fixture) => (
+                    <Box className="avatar" key={fixture.id}>
+                        {fixture.home_team_name} - {fixture.visitor_team_name} {fixture.date}
+                        <Avatar variant="square" alt="Home team image" src={fixture.home_team_image} />
+                        <Avatar variant="square" alt="Visitor team image" src={fixture.visitor_team_image} />
+                    </Box>
+                ))}
             </div>
 
             <svg
