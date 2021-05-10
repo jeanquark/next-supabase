@@ -130,12 +130,13 @@ const Event = () => {
 
     return (
         <>
-            <Navbar title={"Event"} links={['fixtures']} />
+            <Navbar title={"Event"} links={['fixtures', 'admin']} />
 
             <Container className={classes.container}>
                 <Grid container spacing={0}>
                     <Grid item xs={12} sm={6}>
-                        <EventDetails />
+                        {/* <EventDetails /> */}
+                        user.role: { user?.role }
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         {/* <MessageList /> */}

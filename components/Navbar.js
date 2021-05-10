@@ -71,7 +71,7 @@ export default function ButtonAppBar(props) {
                         <>
                             <Box mx={2}>Welcome, {user?.email}</Box>
                             {props.links?.map((link, index) => (
-                                <Link href="/fixtures" passHref key={index}>
+                                <Link href={link} passHref key={index}>
                                     <Button component="a" color="inherit">
                                         {link}
                                     </Button>
