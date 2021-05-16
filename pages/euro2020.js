@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container, Grid, Box, Paper, Typography, Toolbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
 import Navbar from '../components/Navbar'
+import dynamic from 'next/dynamic'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,6 +29,7 @@ export default function euro2020() {
     const [fixturesByGroup, setFixturesByGroup] = useState([[]])
     // const [standings, setStandings] = useState([])
     const [standingsByGroup, setStandingsByGroup] = useState([[]])
+    const [country, setCountry] = useState('europe-uefa-euro2020')
 
     useEffect(() => {
         fetchFixtures()
@@ -89,37 +91,11 @@ export default function euro2020() {
         }
     }
 
-    // const fixturesByGroup = async (index) => {
-    //     console.log('fixturesByGroup: ', fixtures)
-    // }
-
-    // const groups = [[]]
-    // const groups2 = [
-    //     [
-    //         {
-    //             id: 1,
-    //             rank: 1,
-    //             name: 'Switzerland',
-    //         },
-    //         {
-    //             id: 2,
-    //             rank: 2,
-    //             name: 'Italy',
-    //         },
-    //     ],
-    //     [
-    //         {
-    //             id: 3,
-    //             rank: 1,
-    //             name: 'France',
-    //         },
-    //         {
-    //             id: 4,
-    //             rank: 2,
-    //             name: 'England',
-    //         },
-    //     ],
-    // ]
+    const getDynamicComponent = (c) => dynamic(() => import(`../components/svg/${c}`), {
+        ssr: false,
+        loading: () => <p>Loading...</p>,
+    });
+    const DynamicComponent = getDynamicComponent(country);
 
     return (
         <>
@@ -130,10 +106,11 @@ export default function euro2020() {
             <Navbar title={'Euro 2020'} links={['fixtures', 'test']} />
 
             <Grid container>
-                <Grid item xs={6}>
-                    <Paper className={classes.paper}>Map</Paper>
+                <Grid item sm={12} md={6}>
+                    {/* <Paper className={classes.paper}>Map</Paper> */}
+                    <DynamicComponent style={{}}/>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item sm={12} md={6}>
                     <Grid container>
                         <Grid item xs={12}>
                             <Typography gutterBottom variant="h5" className={classes.typography}>
@@ -149,7 +126,7 @@ export default function euro2020() {
                             }}
                         >
                             {standingsByGroup.map((group, index) => (
-                                <Grid item xs={6} key={index}>
+                                <Grid item xs={12} sm={6} md={12} lg={6} key={index}>
                                     <TableContainer component={Paper} key={index}>
                                         <Typography variant="h6" className={classes.typography}>
                                             {group && group[0] ? group[0]['group_name'] : ''}
@@ -175,9 +152,9 @@ export default function euro2020() {
                                             <TableHead>
                                                 <TableRow>
                                                     <TableCell>Rank</TableCell>
-                                                    <TableCell align="right">Pts</TableCell>
+                                                    <TableCell align="right">pts</TableCell>
                                                     <TableCell align="right">Played</TableCell>
-                                                    <TableCell align="right">Diff</TableCell>
+                                                    <TableCell align="right">+/-</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
