@@ -65,7 +65,7 @@ export default function Fixtures() {
 				<title>Fixtures</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-            <Navbar title={'Fixtures'} links={['test', 'actions', 'admin']} />
+            <Navbar title={'Fixtures'} links={['euro2020', 'test', 'actions', 'admin']} />
 
             <Container className={classes.container}>
                 <Box my={5}>

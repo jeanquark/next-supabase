@@ -13,7 +13,38 @@ export default async function fetchNextFixtures(req, res) {
         const { response } = await data2.json()
         // console.log('[api/api-football/fetchNextFixtures] response: ', response);
         let array = []
+        let group = ''
+        const teamGroupHashObject = {
+            1: 'B', // Belgium
+            2: 'F', // France
+            3: 'D', // Croatia
+            4: 'B', // Russia
+            5: 'E', // Sweden
+            9: 'E', // Spain
+            10: 'D', // England
+            15: 'A', // Switzerland
+            21: 'B', // Denmark
+            24: 'E', // Poland
+            25: 'F', // Germany
+            27: 'F', // Portugal
+            767: 'A', // Wales
+            768: 'A', // Italy
+            769: 'F', // Hungary
+            770: 'D', // Czech Republic
+            772: 'C', // Ukraine
+            773: 'E', // Slovakia
+            775: 'C', // Austria
+            777: 'A', // Turkey
+            1105: 'C', // FYR Macedonia
+            1099: 'B', // Finland
+            1108: 'D', // Scotland
+            1118: 'C' // Netherlands
+        }
         for (let i = 0; i < response.length; i++) {
+            if (response[i]['league']['round'].startsWith('Group Stage')) {
+                // console.log('yes!')
+                group = teamGroupHashObject[response[i]['teams']['home']['id']]
+            }
             array.push({
                 fixture_id: response[i]['fixture']['id'],
                 home_team_id: response[i]['teams']['home']['id'],
@@ -25,8 +56,10 @@ export default async function fetchNextFixtures(req, res) {
                 venue: response[i]['fixture']['venue']['name'],
                 city: response[i]['fixture']['venue']['city'],
                 date: response[i]['fixture']['date'],
+                timestamp: response[i]['fixture']['timestamp'],
                 league_id: response[i]['league']['id'],
                 round: response[i]['league']['round'],
+                group: group
             })
         }
         console.log('[api/api-football/fetchNextFixtures] array: ', array)
