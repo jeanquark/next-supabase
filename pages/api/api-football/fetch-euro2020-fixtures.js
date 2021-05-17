@@ -1,4 +1,5 @@
 import { supabase } from "../../../utils/supabaseClient";
+import slugify from 'slugify'
 
 export default async function fetchNextFixtures(req, res) {
     try {
@@ -14,6 +15,7 @@ export default async function fetchNextFixtures(req, res) {
         // console.log('[api/api-football/fetchNextFixtures] response: ', response);
         let array = []
         let group = ''
+        let venueSlug = ''
         const teamGroupHashObject = {
             1: 'B', // Belgium
             2: 'F', // France
@@ -45,6 +47,7 @@ export default async function fetchNextFixtures(req, res) {
                 // console.log('yes!')
                 group = teamGroupHashObject[response[i]['teams']['home']['id']]
             }
+            venueSlug = slugify(response[i]['fixture']['venue']['name'] || '', { lower: true })
             array.push({
                 fixture_id: response[i]['fixture']['id'],
                 home_team_id: response[i]['teams']['home']['id'],
@@ -55,12 +58,13 @@ export default async function fetchNextFixtures(req, res) {
                 visitor_team_image: response[i]['teams']['away']['logo'],
                 venue_id: response[i]['fixture']['venue']['id'],
                 venue_name: response[i]['fixture']['venue']['name'],
+                venue_slug: venueSlug,
                 city: response[i]['fixture']['venue']['city'],
                 date: response[i]['fixture']['date'],
                 timestamp: response[i]['fixture']['timestamp'],
                 league_id: response[i]['league']['id'],
                 round: response[i]['league']['round'],
-                group: group
+                group_name: group
             })
         }
         console.log('[api/api-football/fetchNextFixtures] array: ', array)
@@ -74,7 +78,8 @@ export default async function fetchNextFixtures(req, res) {
 
         return res.status(200).json({ success: true, length: response.length });
     } catch (error) {
-        return res.status(500).json('An error occured on the server: ', error);
+        console.log(error)
+        return res.status(500).json('An error occured on the server: ', error.response.data);
 
     }
 

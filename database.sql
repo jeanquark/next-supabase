@@ -71,13 +71,14 @@ CREATE TABLE events (
   visitor_team_score INT,
   venue_id INT,
   venue_name VARCHAR(60),
+  venue_slug VARCHAR(60),
   city VARCHAR(60),
   country VARCHAR(60),
   date timestamp with time zone,
   timestamp INT,
   league_id INT,
   round VARCHAR(60),
-  group VARCHAR(60),
+  group_name VARCHAR(60),
   inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -85,7 +86,7 @@ CREATE TABLE events (
 CREATE UNIQUE INDEX fixture_idx ON events (fixture_id);
 -- 2. Enable RLS (Prevent any action on the table)
 ALTER TABLE events enable row level security;
-CREATE POLICY "Events are viewable by everyone." ON events for SELECT;
+CREATE POLICY "Events are viewable by everyone." ON events for SELECT USING (true);
 
 
 INSERT INTO events(fixture_id, home_team_name, home_team_id, home_team_score, visitor_team_name, 

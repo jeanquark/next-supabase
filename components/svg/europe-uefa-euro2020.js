@@ -1,8 +1,36 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/initSupabase'
-import { Box, Avatar } from '@material-ui/core'
+import { Grid, Typography, Box, Chip, Avatar, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
+import Moment from 'react-moment'
+import FaceIcon from '@material-ui/icons/Face';
+
+const useStyles = makeStyles((theme) => ({
+    avatar: {
+        width: theme.spacing(3),
+        height: theme.spacing(2),
+        display: 'inline-block',
+        verticalAlign: 'middle'
+    },
+    chip: {
+        margin: '2px 5px'
+    },
+    typography: {
+        textAlign: 'center',
+        margin: 'auto',
+    },
+    inline: {
+        display: 'inline-block',
+        verticalAlign: 'middle'
+    },
+    large: {
+        width: theme.spacing(10),
+        height: theme.spacing(7),
+    },
+}))
 
 export default function europe({ onSelectCountry }) {
+    const classes = useStyles()
     const [showTooltip, setShowTooltip] = useState(false)
     const [loading, setLoading] = useState(false)
     const [stadiums, setStadiums] = useState({})
@@ -10,13 +38,6 @@ export default function europe({ onSelectCountry }) {
 
     useEffect(async () => {
         console.log('[useEffect] stadiums: ', stadiums)
-        // let { data, error } = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', 700)
-        // if (error) console.log('error', error)
-        // else {
-        //     setStadiums({
-        //         [700]: { ...stadiums[700], fixtures: 'abc' }
-        //     })
-        // }
     }, [stadiums])
 
     const fetchStadium = async (stadiumId) => {
@@ -73,7 +94,7 @@ export default function europe({ onSelectCountry }) {
             if (!stadiums[stadiumId]) {
                 await fetchStadium(stadiumId)
                 // await fetchEventsByStadium(stadiumId)
-            // }
+                // }
             } else { // If not, send API request to retrieve stadium info
                 setStadium(stadiums[stadiumId])
             }
@@ -107,8 +128,6 @@ export default function europe({ onSelectCountry }) {
         mypopup.style.display = "none";
     }
 
-    const Tooltip = () => <div>tooltip</div>
-
     return (
         <>
             <style jsx>{`
@@ -117,7 +136,7 @@ export default function europe({ onSelectCountry }) {
                     fill: "#000000";
                 }
                 #mypopup {
-                    width: 240px;
+                    width: 260px;
                     padding: 10px;
                     font-family: Arial, sans-serif;
                     background-color: orange;
@@ -135,32 +154,51 @@ export default function europe({ onSelectCountry }) {
                     top: 28px;
                 }
                 .float-left {
-                    transform: translate(-280px, 0px);
+                    transform: translate(-300px, -100px);
+                }
+                .float-right {
+                    transform: translate(0px, -100px);
                 }
                 .float-left::before {
-                    transform: translate(240px, 0px) rotate(45deg) ;
+                    transform: translate(260px, 100px) rotate(45deg) ;
                 }
                 .float-right::before {
-                    transform: rotate(45deg);
+                    transform: translate(0px, 100px) rotate(45deg);
                 }
-                .avatar: {
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                },
+                
             `}</style>
-            <h2>Europe SVG map</h2><br />
             <div id="mypopup" className="">
-                {!loading ? <p>
-                    ID {stadium.id}, {stadium.name}, {stadium.city}, {stadium.country}
-                </p> : <p>loading...</p>}
-                {stadium.fixtures?.map((fixture) => (
-                    <Box className="avatar" key={fixture.id}>
-                        {fixture.home_team_name} - {fixture.visitor_team_name} {fixture.date}
-                        <Avatar variant="square" alt="Home team image" src={fixture.home_team_image} />
-                        <Avatar variant="square" alt="Visitor team image" src={fixture.visitor_team_image} />
-                    </Box>
-                ))}
+                {!loading ? <Grid container alignItems="center" justify="center">
+                    <Grid item xs={12}>
+                        <Typography variant="body1" className={classes.typography}>
+                            {stadium.name}, {stadium.city}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        {/* <Avatar variant="square" className={classes.large} src={`/images/stadiums_euro2020/${stadium.api_football_id}.jpg`} /> */}
+                        <img src={`/images/stadiums_euro2020/${stadium.api_football_id}.jpg`} width="100%" />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Chip label={`${stadium.country}`} color="primary" size="small" className={classes.chip} /><Chip label={stadium.capacity} color="secondary" size="small" icon={<FaceIcon />} className={classes.chip} />
+                    </Grid>
+
+                </Grid> : <p>loading...</p>}
+
+
+                <Table aria-label="simple table" size="small">
+                    <TableBody>
+                        {stadium.fixtures?.map((fixture, index) => (
+                            <TableRow key={index}>
+                                <TableCell align="left"><Avatar variant="square" className={classes.avatar} src={`/images/countries_euro2020/${fixture.home_team_id}.png`} />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <Moment local format="MMM Do">{fixture.date}</Moment>
+                                </TableCell>
+                                <TableCell align="right"><Avatar variant="square" className={classes.avatar} src={`/images/countries_euro2020/${fixture.visitor_team_id}.png`} /></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
             </div>
 
             <svg
@@ -1096,7 +1134,7 @@ export default function europe({ onSelectCountry }) {
                     transform="translate(-283.68719,-87.199905)">
 
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="700"
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1114,7 +1152,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="2607"
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1131,7 +1169,7 @@ export default function europe({ onSelectCountry }) {
                             <continent>Europe</continent>
                         </desc></circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id=""
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1149,7 +1187,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id=""
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1167,7 +1205,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id=""
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1185,7 +1223,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="1326"
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1203,7 +1241,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="910"
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1221,7 +1259,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="1117"
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1239,7 +1277,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="439"
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1257,7 +1295,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="2617"
                         className="stadium"
                         onMouseOver={mouseOver}
@@ -1275,7 +1313,7 @@ export default function europe({ onSelectCountry }) {
                         </desc>
                     </circle>
                     <circle
-                        fill="#ff0000"
+                        fill="#FF4500"
                         id="489"
                         className="stadium"
                         onMouseOver={mouseOver}

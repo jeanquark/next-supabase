@@ -3,14 +3,32 @@ import { supabase } from '../lib/initSupabase'
 import Head from 'next/head'
 import Link from 'next/link'
 import { makeStyles } from '@material-ui/core/styles'
-import { Container, Grid, Box, Paper, Typography, Toolbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core'
+import { Avatar, Container, Grid, Box, Paper, Typography, Toolbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, NoSsr } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
 import Navbar from '../components/Navbar'
 import dynamic from 'next/dynamic'
+import Moment from 'react-moment'
 
 const useStyles = makeStyles((theme) => ({
+    // root: {
+    //     flexGrow: 1,
+    // },
     root: {
-        flexGrow: 1,
+        display: 'flex',
+        '& > *': {
+            margin: theme.spacing(1),
+        },
+    },
+    avatar: {
+        width: theme.spacing(3),
+        height: theme.spacing(3),
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        margin: '0px 1em'
+    },
+    inline: {
+        display: 'inline-block',
+        verticalAlign: 'middle'
     },
     paper: {
         padding: theme.spacing(2),
@@ -55,7 +73,7 @@ export default function euro2020() {
                 F: 5,
             }
             for (let i = 0; i < fixtures.length; i++) {
-                index = groupIndexHashObject[fixtures[i]['group']]
+                index = groupIndexHashObject[fixtures[i]['group_name']]
                 // console.log('index: ', index)
                 if (!array[index]) {
                     array[index] = []
@@ -105,17 +123,18 @@ export default function euro2020() {
             </Head>
             <Navbar title={'Euro 2020'} links={['fixtures', 'test']} />
 
-            <Grid container>
-                <Grid item sm={12} md={6}>
-                    {/* <Paper className={classes.paper}>Map</Paper> */}
-                    <DynamicComponent style={{}}/>
-                </Grid>
-                <Grid item sm={12} md={6}>
+            <Grid container alignItems="center" justify="center">
+
+                <DynamicComponent style={{}} />
+
+                <Grid item sm={12} md={12}>
                     <Grid container>
                         <Grid item xs={12}>
-                            <Typography gutterBottom variant="h5" className={classes.typography}>
-                                Standings
+                            <Box mt={4}>
+                                <Typography gutterBottom variant="h5" className={classes.typography}>
+                                    Groups
                             </Typography>
+                            </Box>
                         </Grid>
                         <Grid
                             container
@@ -132,19 +151,26 @@ export default function euro2020() {
                                             {group && group[0] ? group[0]['group_name'] : ''}
                                         </Typography>
 
-                                        <Table aria-label="simple table">
+                                        {/* <NoSsr> */}
+                                        <Table aria-label="simple table" size="small">
                                             <TableBody>
-                                                {fixturesByGroup[index] ? (fixturesByGroup[index].map((fixture, index) => (
+                                                {fixturesByGroup[index]?.map((fixture, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell align="left">{fixture.home_team_name}</TableCell>
-                                                        <TableCell align="center">
-                                                            {fixture.home_team_score} - {fixture.visitor_team_score}
+                                                        <TableCell align="left"><Avatar className={classes.avatar} src={`/images/countries_euro2020/${fixture.home_team_id}.png`} />
+                                                        <span className={classes.inline}>{fixture.home_team_name}</span>
                                                         </TableCell>
-                                                        <TableCell align="right">{fixture.visitor_team_name}</TableCell>
+                                                        {/* <TableCell align="center">
+                                                            {fixture.home_team_score} - {fixture.visitor_team_score}
+                                                        </TableCell> */}
+                                                        <TableCell align="center">
+                                                            <Moment local format="DD-MM HH:mm">{fixture.date}</Moment>
+                                                        </TableCell>
+                                                        <TableCell align="right"><span className={classes.inline}>{fixture.visitor_team_name}</span><Avatar className={classes.avatar} src={`/images/countries_euro2020/${fixture.visitor_team_id}.png`} /></TableCell>
                                                     </TableRow>
-                                                ))) : 'no data'}
+                                                ))}
                                             </TableBody>
                                         </Table>
+                                        {/* </NoSsr> */}
 
                                         <br /><br />
 
