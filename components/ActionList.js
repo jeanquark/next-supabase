@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Auth } from '@supabase/ui'
 import Countdown from 'react-countdown'
 import Moment from 'react-moment'
-import { Grid, TextField, Button, Paper, Box } from '@material-ui/core'
+import { Grid, Typography, TextField, Button, Paper, Box } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,6 +23,13 @@ const useStyles = makeStyles((theme) => ({
             cursor: 'pointer',
         },
     },
+    paper: {
+        '&:hover': {
+            cursor: 'pointer',
+            background: theme.palette.primary.main,
+            color: 'white'
+        }
+    }
 }))
 
 export default function Messages() {
@@ -32,6 +39,8 @@ export default function Messages() {
     const { user, session } = Auth.useUser()
     const [action, setAction] = useState('')
     const [actions, setActions] = useState([])
+    const [tests, setTests] = useState([])
+    const [eventActions, setEventActions] = useState([])
     const [newAction, handleNewAction] = useState('')
     const [updateAction, handleUpdateAction] = useState('')
     const [deleteAction, handleDeleteAction] = useState('')
@@ -39,56 +48,67 @@ export default function Messages() {
     const actionsEndRef = useRef(null)
     let mySubscription = null
 
-    useEffect(() => {
-        console.log('[useEffect] id: ', id)
-        if (id != undefined) {
-            getActionsAndSubscribe(id)
-        }
-        return async () => {
-            const { data } = await supabase.removeSubscription(mySubscription)
-            // Remove user from event
-            await supabase
-                .from('user_event')
-                .upsert(
-                    { user_id: 1, event_id: null },
-                    { onConflict: 'user_id' }
-                )
-            console.log('Remove supabase subscription by useEffect unmount. data: ', data)
-        }
-    }, [id])
+    // useEffect(() => {
+    //     console.log('[useEffect] id: ', id)
+    //     if (id != undefined) {
+    //         getActionsAndSubscribe(id)
+    //     }
+    //     return async () => {
+    //         const { data } = await supabase.removeSubscription(mySubscription)
+    //         // Remove user from event
+    //         await supabase
+    //             .from('event_users')
+    //             .upsert(
+    //                 { user_id: 1, event_id: null },
+    //                 { onConflict: 'user_id' }
+    //             )
+    //         console.log('Remove supabase subscription by useEffect unmount. data: ', data)
+    //     }
+    // }, [id])
 
     useEffect(() => {
-        console.log('[useEffect] newAction: ', newAction)
-        if (newAction) {
-            setActions((a) => [...a, newAction])
-            scrollToBottom()
-        }
-    }, [newAction])
+        console.log('[useEffect] fetchActions')
+        fetchActions()
+    }, [])
 
-    useEffect(() => {
-        try {
-            console.log('[useEffect] updateAction: ', updateAction)
-            console.log('actions: ', actions)
-            if (updateAction) {
-                const index = actions.findIndex((a) => a.id == updateAction.id)
-                console.log('index: ', index)
-                let newActions = [...actions]
-                newActions[index]['number_participants'] = updateAction.number_participants
-                newActions[index]['is_completed'] = updateAction.is_completed
-                setActions(newActions)
-            }
-        } catch (error) {
-            console.log('error: ', error)
-        }
-    }, [updateAction])
+    // useEffect(() => {
+    //     console.log('[useEffect] newAction: ', newAction)
+    //     if (newAction) {
+    //         setActions((a) => [...a, newAction])
+    //         scrollToBottom()
+    //     }
+    // }, [newAction])
 
-    useEffect(() => {
-        console.log('[useEffect] deleteAction: ', deleteAction)
-        if (deleteAction) {
-            setActions(actions.filter(a => a.id !== deleteAction.id))
-        }
-    }, [deleteAction])
-    
+    // useEffect(() => {
+    //     try {
+    //         console.log('[useEffect] updateAction: ', updateAction)
+    //         console.log('actions: ', actions)
+    //         if (updateAction) {
+    //             const index = actions.findIndex((a) => a.id == updateAction.id)
+    //             console.log('index: ', index)
+    //             let newActions = [...actions]
+    //             newActions[index]['number_participants'] = updateAction.number_participants
+    //             newActions[index]['is_completed'] = updateAction.is_completed
+    //             setActions(newActions)
+    //         }
+    //     } catch (error) {
+    //         console.log('error: ', error)
+    //     }
+    // }, [updateAction])
+
+    // useEffect(() => {
+    //     console.log('[useEffect] deleteAction: ', deleteAction)
+    //     if (deleteAction) {
+    //         setActions(actions.filter(a => a.id !== deleteAction.id))
+    //     }
+    // }, [deleteAction])
+
+    const fetchActions = async () => {
+        const { data, error } = await supabase.from('actions').select('*').order('id', true)
+        console.log('data: ', data)
+        if (error) console.log('error: ', error)
+        else setActions(data)
+    }
 
     const onCountdownComplete = (action) => {
         console.log('onCountdownComplete: ', action)
@@ -111,10 +131,10 @@ export default function Messages() {
                 return
             }
             setActions(data)
-            
+
             // Add user to event
             await supabase
-                .from('user_event')
+                .from('event_users')
                 .upsert(
                     { user_id: 1, event_id: id },
                     { onConflict: 'user_id' }
@@ -190,9 +210,20 @@ export default function Messages() {
                 Create new action
             </Button>
             <br />
-            <Countdown date={Date.now() + 10000} onComplete={() => onCountdownComplete()} />
+            {/* <Countdown date={Date.now() + 10000} onComplete={() => onCountdownComplete()} /> */}
             <br />
-            <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
+            <h3>Actions:</h3>
+            <Box display="flex">
+                {actions.map((action) => (
+                    <Box m={1} p={0} key={action.id}>
+                        <Paper elevation={1} className={classes.paper} style={{ padding: '10px'}}>
+                            <Typography variant="h6">{action.name}</Typography>
+                            <Typography variant="body2">{action.description}</Typography>
+                        </Paper>
+                    </Box>
+                ))}
+            </Box>
+            {/* <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
                 {actions.map((action) => (
                     <Box key={action.id}>
                         <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
@@ -206,7 +237,7 @@ export default function Messages() {
                     </Box>
                 ))}
                 <div ref={actionsEndRef} />
-            </Box>
+            </Box> */}
         </>
     )
 }

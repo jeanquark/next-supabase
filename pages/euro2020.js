@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/initSupabase'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { makeStyles } from '@material-ui/core/styles'
 import { Avatar, Container, Grid, Box, Paper, Typography, Toolbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, NoSsr } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
+import NavbarOriginal from '../components/Navbar_ORIGINAL'
 import Navbar from '../components/Navbar'
 import dynamic from 'next/dynamic'
 import Moment from 'react-moment'
+import { Router } from 'next/router'
 
 const useStyles = makeStyles((theme) => ({
     // root: {
@@ -39,10 +42,18 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         margin: 'auto',
     },
+    hover: {
+        cursor: 'pointer'
+    },
+    content: {
+        flexGrow: 1,
+        padding: theme.spacing(3),
+    },
 }))
 
 export default function euro2020() {
     const classes = useStyles()
+    const router = useRouter()
     const [fixtures, setFixtures] = useState([])
     const [fixturesByGroup, setFixturesByGroup] = useState([[]])
     // const [standings, setStandings] = useState([])
@@ -109,6 +120,11 @@ export default function euro2020() {
         }
     }
 
+    const redirectTo = (link) => {
+        console.log('redirectTo: ', link)
+        router.push(`/events/${link}`)
+    }
+
     const getDynamicComponent = (c) => dynamic(() => import(`../components/svg/${c}`), {
         ssr: false,
         loading: () => <p>Loading...</p>,
@@ -116,12 +132,13 @@ export default function euro2020() {
     const DynamicComponent = getDynamicComponent(country);
 
     return (
-        <>
+        <div className={classes.root}>
             <Head>
                 <title>Euro 2020</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Navbar title={'Euro 2020'} links={['fixtures', 'test']} />
+            {/* <Navbar2 title={'Euro 2020'} links={['admin', 'fixtures', 'test']} /> */}
+            <Navbar />
 
             <Grid container alignItems="center" justify="center">
 
@@ -130,9 +147,9 @@ export default function euro2020() {
                 <Grid item sm={12} md={12}>
                     <Grid container>
                         <Grid item xs={12}>
-                            <Box mt={4}>
+                            <Box mt={4} mb={1}>
                                 <Typography gutterBottom variant="h5" className={classes.typography}>
-                                    Groups
+                                    Groups phase
                             </Typography>
                             </Box>
                         </Grid>
@@ -147,17 +164,20 @@ export default function euro2020() {
                             {standingsByGroup.map((group, index) => (
                                 <Grid item xs={12} sm={6} md={12} lg={6} key={index}>
                                     <TableContainer component={Paper} key={index}>
-                                        <Typography variant="h6" className={classes.typography}>
-                                            {group && group[0] ? group[0]['group_name'] : ''}
-                                        </Typography>
+                                        <Box my={2}>
+                                            <Typography variant="h6" className={classes.typography}>
+                                                {group && group[0] ? group[0]['group_name'] : ''}
+                                            </Typography>
+                                        </Box>
 
                                         {/* <NoSsr> */}
                                         <Table aria-label="simple table" size="small">
                                             <TableBody>
                                                 {fixturesByGroup[index]?.map((fixture, index) => (
-                                                    <TableRow key={index}>
+
+                                                    <TableRow key={index} hover className={classes.hover} onClick={() => redirectTo(fixture.id)}>
                                                         <TableCell align="left"><Avatar className={classes.avatar} src={`/images/countries_euro2020/${fixture.home_team_id}.png`} />
-                                                        <span className={classes.inline}>{fixture.home_team_name}</span>
+                                                            <span className={classes.inline}>{fixture.home_team_name}</span>
                                                         </TableCell>
                                                         {/* <TableCell align="center">
                                                             {fixture.home_team_score} - {fixture.visitor_team_score}
@@ -179,7 +199,7 @@ export default function euro2020() {
                                                 <TableRow>
                                                     <TableCell>Rank</TableCell>
                                                     <TableCell align="right">pts</TableCell>
-                                                    <TableCell align="right">Played</TableCell>
+                                                    <TableCell align="right">played</TableCell>
                                                     <TableCell align="right">+/-</TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -203,6 +223,6 @@ export default function euro2020() {
                     </Grid>
                 </Grid>
             </Grid>
-        </>
+        </div>
     )
 }

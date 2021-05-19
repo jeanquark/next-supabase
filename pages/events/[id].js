@@ -7,7 +7,7 @@ import Link from 'next/link'
 import EventDetails from '../../components/EventDetails'
 import MessageList from '../../components/MessageList'
 import ActionList from '../../components/ActionList'
-import Navbar from '../../components/Navbar'
+import Navbar from '../../components/Navbar_ORIGINAL'
 import { Container, Grid, AppBar, Toolbar, Box, Button, Typography, IconButton, Menu, MenuItem } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
@@ -122,15 +122,9 @@ const Event = () => {
     //     }
     // }
 
-    async function logoutHandler(e) {
-        console.log('e: ', e)
-        const { error } = await supabase.auth.signOut()
-        console.log('error: ', error)
-    }
-
     return (
         <>
-            <Navbar title={"Event"} links={['fixtures', 'admin']} />
+            <Navbar title={`Event ${id}`} links={['euro2020', 'fixtures', 'admin']} />
 
             <Container className={classes.container}>
                 <Grid container spacing={0}>

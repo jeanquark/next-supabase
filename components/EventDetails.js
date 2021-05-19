@@ -17,6 +17,10 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(10),
         margin: theme.spacing(1),
     },
+    flag: {
+        width: theme.spacing(12),
+        height: theme.spacing(8)
+    }
 }))
 
 export default function EventDetails() {
@@ -49,17 +53,17 @@ export default function EventDetails() {
 
     const getInitialEvent = async (id) => {
         console.log('getInitialEvent')
-            const { data, error } = await supabase
-                .from('events')
-                .select('*')
-                .eq('id', id)
-            if (error) {
-                setError(error.message)
-                supabase.removeSubscription(mySubscription)
-                mySubscription = null
-                return
-            }
-            setEvent(data[0])
+        const { data, error } = await supabase
+            .from('events')
+            .select('*')
+            .eq('id', id)
+        if (error) {
+            setError(error.message)
+            supabase.removeSubscription(mySubscription)
+            mySubscription = null
+            return
+        }
+        setEvent(data[0])
     }
 
     const getEventAndSubscribe = async (id) => {
@@ -84,8 +88,8 @@ export default function EventDetails() {
             <Box display="flex" style={{ margin: 10, padding: 8 }}>
                 <Box m="auto">
                     <Box className={classes.avatar}>
-                        <Avatar variant="square" alt="Home team image" src={event.home_team_image} className={classes.large} />
-                        <Avatar variant="square" alt="Visitor team image" src={event.visitor_team_image} className={classes.large} />
+                        <img src={`/images/countries_euro2020/${event.home_team_id}.png`} height="60" style={{ marginRight: '10px' }} />
+                        <img src={`/images/countries_euro2020/${event.visitor_team_id}.png`} height="60" style={{ marginLeft: '10px' }} />
                     </Box>
                     <Typography variant="h5" align="center">
                         {event.home_team_name} - {event.visitor_team_name}
@@ -94,7 +98,7 @@ export default function EventDetails() {
                         <b>{event.home_team_score}</b>&nbsp;:&nbsp;<b>{event.visitor_team_score}</b>
                     </Typography> */}
                     <Typography component="p" align="center">
-                        <b>{event.venue}</b>,&nbsp;<b>{event.city}</b>
+                        <b>{event.venue_name}</b>,&nbsp;<b>{event.city}</b>
                     </Typography>
                     <Typography component="p" align="center">
                         <NoSsr>

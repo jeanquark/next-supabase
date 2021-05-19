@@ -40,17 +40,17 @@ export default function europe({ onSelectCountry }) {
         console.log('[useEffect] stadiums: ', stadiums)
     }, [stadiums])
 
-    const fetchStadium = async (stadiumId) => {
+    const fetchStadium = async (stadiumSlug) => {
         try {
             setLoading(true)
-            console.log('fetchStadium ', stadiumId)
-            const { data: stadiumDetails, error: error1 } = await supabase.from('stadiums').select('*').eq('api_football_id', stadiumId)
+            console.log('fetchStadium ', stadiumSlug)
+            const { data: stadiumDetails, error: error1 } = await supabase.from('stadiums').select('*').eq('slug', stadiumSlug)
             if (error1) {
                 console.log('error1 ', error1)
                 throw error1
             }
 
-            const { data: stadiumFixtures, error: error2 } = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_id', stadiumId)
+            const { data: stadiumFixtures, error: error2 } = await supabase.from('events').select('*').eq('league_id', 4).eq('venue_slug', stadiumSlug)
             if (error2) {
                 console.log('error2 ', error2)
                 throw error2
@@ -62,7 +62,7 @@ export default function europe({ onSelectCountry }) {
 
             setStadiums({
                 ...stadiums,
-                [obj['api_football_id']]: obj
+                [obj['slug']]: obj
             })
             setStadium({
                 ...obj
@@ -77,8 +77,8 @@ export default function europe({ onSelectCountry }) {
     async function mouseOver(e) {
         try {
             console.log('mouseOver!: ', e)
-            const stadiumId = e.target.id
-            showPopup(stadiumId)
+            const stadiumSlug = e.target.id
+            showPopup(stadiumSlug)
             const { clientX, clientY } = e
             console.log('clientX: ', clientX)
             console.log('clientY: ', clientY)
@@ -91,12 +91,12 @@ export default function europe({ onSelectCountry }) {
             }
 
             // Check if data is in local store. If not, send API request to retrieve stadium info
-            if (!stadiums[stadiumId]) {
-                await fetchStadium(stadiumId)
-                // await fetchEventsByStadium(stadiumId)
+            if (!stadiums[stadiumSlug]) {
+                await fetchStadium(stadiumSlug)
+                // await fetchEventsByStadium(stadiumSlug)
                 // }
             } else { // If not, send API request to retrieve stadium info
-                setStadium(stadiums[stadiumId])
+                setStadium(stadiums[stadiumSlug])
             }
         } catch (error) {
             console.log('error: ', error)
@@ -112,9 +112,9 @@ export default function europe({ onSelectCountry }) {
         hidePopup()
     }
 
-    function showPopup(stadiumId) {
-        console.log('showPopup. stadiumId: ', stadiumId)
-        var myicon = document.getElementById(stadiumId);
+    function showPopup(stadiumSlug) {
+        console.log('showPopup. stadiumSlug: ', stadiumSlug)
+        var myicon = document.getElementById(stadiumSlug);
         var mypopup = document.getElementById("mypopup");
         var iconPos = myicon.getBoundingClientRect();
         mypopup.style.left = (iconPos.right + 15) + "px";
@@ -165,6 +165,15 @@ export default function europe({ onSelectCountry }) {
                 .float-right::before {
                     transform: translate(0px, 100px) rotate(45deg);
                 }
+                .blink-me {
+                    animation: blinker 1s linear infinite;
+                  }
+                  
+                  @keyframes blinker {
+                    50% {
+                      opacity: 0;
+                    }
+                  }
                 
             `}</style>
             <div id="mypopup" className="">
@@ -176,7 +185,7 @@ export default function europe({ onSelectCountry }) {
                     </Grid>
                     <Grid item xs={12}>
                         {/* <Avatar variant="square" className={classes.large} src={`/images/stadiums_euro2020/${stadium.api_football_id}.jpg`} /> */}
-                        <img src={`/images/stadiums_euro2020/${stadium.api_football_id}.jpg`} width="100%" />
+                        {stadium && stadium.slug && <img src={`/images/stadiums_euro2020/${stadium.slug}.jpg`} width="100%" />}
                     </Grid>
                     <Grid item xs={12}>
                         <Chip label={`${stadium.country}`} color="primary" size="small" className={classes.chip} /><Chip label={stadium.capacity} color="secondary" size="small" icon={<FaceIcon />} className={classes.chip} />
@@ -1135,8 +1144,8 @@ export default function europe({ onSelectCountry }) {
 
                     <circle
                         fill="#FF4500"
-                        id="700"
-                        className="stadium"
+                        id="allianz_arena"
+                        className="stadium blink-me"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
                         cx="606.10382"
@@ -1153,7 +1162,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id="2607"
+                        id="olympic_stadium"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1170,7 +1179,7 @@ export default function europe({ onSelectCountry }) {
                         </desc></circle>
                     <circle
                         fill="#FF4500"
-                        id=""
+                        id="la_cartuja"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1188,7 +1197,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id=""
+                        id="krestovsky_stadium"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1206,7 +1215,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id=""
+                        id="puskas_arena"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1224,7 +1233,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id="1326"
+                        id="arena_nationala"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1242,7 +1251,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id="910"
+                        id="stadio_olimpico"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1260,7 +1269,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id="1117"
+                        id="johan_cruyff_arena"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1278,7 +1287,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id="439"
+                        id="parken_stadium"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1296,7 +1305,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id="2617"
+                        id="hampden_park"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
@@ -1314,7 +1323,7 @@ export default function europe({ onSelectCountry }) {
                     </circle>
                     <circle
                         fill="#FF4500"
-                        id="489"
+                        id="wembley_stadium"
                         className="stadium"
                         onMouseOver={mouseOver}
                         onMouseOut={mouseOut}
