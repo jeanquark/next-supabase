@@ -131,7 +131,6 @@ export default function Messages() {
             // 1) Retrieve event actions
             const { data: actions, error: errorActions } = await supabase
                 .from(`event_actions`)
-                // .select(`id, number_participants, participation_threshold, is_completed, expired_at, events (home_team_name, visitor_team_name), actions (name), users (id, full_name)`)
                 .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name), users (id, full_name)')
                 // .select('*')
                 .eq('event_id', id)
@@ -261,7 +260,7 @@ export default function Messages() {
                             <i>
                                 {action.events?.home_team_name} - {action.events?.visitor_team_name}
                             </i>{' '},
-                            by user <i></i>, Participants: {action.number_participants}, isCompleted? {action.is_completed ? 'Yes' : 'No'}, expiredAt: {action.expired_at}, expiresIn: <Countdown date={action.expired_at} onComplete={() => onCountdownComplete(action)} />&nbsp;
+                            by user <i>{action.users?.full_name}</i>, Participants: {action.number_participants}, isCompleted? {action.is_completed ? 'Yes' : 'No'}, expiredAt: {action.expired_at}, expiresIn: <Countdown date={action.expired_at} onComplete={() => onCountdownComplete(action)} />&nbsp;
                             <button onClick={() => joinAction(action.id)}>Participate</button>
                         </Paper>
                     </Box>

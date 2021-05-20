@@ -51,7 +51,7 @@ export async function getServerSideProps({ req }) {
 	console.log('getServerSideProps user: ', user)
 	if (user) {
 		// If no user, redirect to index.
-		return { props: {}, redirect: { destination: '/fixtures', permanent: false } }
+		return { props: {}, redirect: { destination: '/euro2020', permanent: false } }
 	}
 
 	// If there is a user, return it.
