@@ -41,6 +41,7 @@ export default function Messages() {
     const [actions, setActions] = useState([])
     const [tests, setTests] = useState([])
     const [eventActions, setEventActions] = useState([])
+    const [eventUsers, setEventUsers] = useState([])
     const [newAction, handleNewAction] = useState('')
     const [updateAction, handleUpdateAction] = useState('')
     const [deleteAction, handleDeleteAction] = useState('')
@@ -48,26 +49,26 @@ export default function Messages() {
     const actionsEndRef = useRef(null)
     let mySubscription = null
 
-    // useEffect(() => {
-    //     console.log('[useEffect] id: ', id)
-    //     if (id != undefined) {
-    //         getActionsAndSubscribe(id)
-    //     }
-    //     return async () => {
-    //         const { data } = await supabase.removeSubscription(mySubscription)
-    //         // Remove user from event
-    //         await supabase
-    //             .from('event_users')
-    //             .upsert(
-    //                 { user_id: 1, event_id: null },
-    //                 { onConflict: 'user_id' }
-    //             )
-    //         console.log('Remove supabase subscription by useEffect unmount. data: ', data)
-    //     }
-    // }, [id])
+    useEffect(() => {
+        console.log('[useEffect] getActionsAndSubscribe() id: ', id)
+        if (id != undefined) {
+            getActionsAndSubscribe(id)
+        }
+        return async () => {
+            const { data } = await supabase.removeSubscription(mySubscription)
+            // Remove user from event
+            await supabase
+                .from('event_users')
+                .upsert(
+                    { user_id: 1, event_id: null },
+                    { onConflict: 'user_id' }
+                )
+            console.log('Remove supabase subscription by useEffect unmount. data: ', data)
+        }
+    }, [id])
 
     useEffect(() => {
-        console.log('[useEffect] fetchActions')
+        console.log('[useEffect] fetchActions()')
         fetchActions()
     }, [])
 
@@ -103,6 +104,14 @@ export default function Messages() {
     //     }
     // }, [deleteAction])
 
+    const calculateParticipationThreshold = () => {
+        console.log('calculateParticipationThreshold eventUsers: ', eventUsers)
+        if (eventUsers.length < 2) {
+            return 2
+        }
+        return eventUsers.length * 0.5
+    }
+
     const fetchActions = async () => {
         const { data, error } = await supabase.from('actions').select('*').order('id', true)
         console.log('data: ', data)
@@ -111,47 +120,56 @@ export default function Messages() {
     }
 
     const onCountdownComplete = (action) => {
-        console.log('onCountdownComplete: ', action)
+        console.log('onCountdownComplete() action: ', action)
         // Delete from store
         handleDeleteAction(action)
     }
 
     const getInitialActions = async (id) => {
-        console.log('getInitialActions')
-        if (!actions.length) {
-            const { data, error } = await supabase
+        console.log('getInitialActions() id: ', id)
+        if (!eventActions.length) {
+            // 1) Retrieve event actions
+            const { data: actions, error: errorActions } = await supabase
                 .from(`event_actions`)
-                .select(`id, number_participants, participation_threshold, is_completed, expired_at, events (home_team_name, visitor_team_name), actions (name), users (id, full_name)`)
+                // .select(`id, number_participants, participation_threshold, is_completed, expired_at, events (home_team_name, visitor_team_name), actions (name), users (id, full_name)`)
+                .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name), users (id, full_name)')
+                // .select('*')
                 .eq('event_id', id)
                 .order('id', { ascending: true })
-            if (error) {
-                setError(error.message)
+            if (errorActions) {
+                setError(errorActions.message)
+                console.log('error: ', errorActions)
                 supabase.removeSubscription(mySubscription)
                 mySubscription = null
                 return
             }
-            setActions(data)
+            console.log('actions: ', actions)
+            setEventActions(actions)
 
-            // Add user to event
+            // 2) Add user to event
             await supabase
                 .from('event_users')
                 .upsert(
                     { user_id: 1, event_id: id },
                     { onConflict: 'user_id' }
                 )
+
+            // 3) Retrieve event users
+            const { data: users, errorUsers } = await supabase.from('event_users').select('*').eq('event_id', id)
+            if (errorUsers) console.log('error: ', errorUsers)
+            setEventUsers(users)
         }
     }
     const getActionsAndSubscribe = async (id) => {
-        console.log('getActionsAndSubscribe')
+        console.log('getActionsAndSubscribe() id: ', id)
         setError('')
         getInitialActions(id)
         if (!mySubscription) {
             mySubscription = supabase
                 .from(`event_actions:event_id=eq.${id}`)
                 .on('INSERT', (payload) => {
-                    console.log('INSERT')
-                    handleNewAction(payload.new)
-                    // handleCreateAction(payload.new)
+                    console.log('INSERT: ', payload.new)
+                    setEventActions((a) => [...a, payload.new])
                 })
                 .on('UPDATE', (payload) => {
                     console.log('UPDATE')
@@ -169,14 +187,15 @@ export default function Messages() {
         actionsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
 
-    const createAction = async () => {
+    const createAction = async (actionId) => {
         console.log('createAction')
-        const { data, error } = await supabase.from('event_actions').insert([{ event_id: 4, user_id: 1, action_id: 2, participation_threshold: 10 }])
+        const { data, error } = await supabase.from('event_actions').insert([{ event_id: id, user_id: 1, action_id: actionId, participation_threshold: calculateParticipationThreshold() }])
 
         if (error) {
             alert(error.message)
             return
         }
+        console.log('data: ', data)
         console.log('Successfully created action!')
     }
     const joinAction = async (actionId) => {
@@ -195,11 +214,13 @@ export default function Messages() {
         console.log('data: ', data)
     }
 
+    // const handleAction = async (actionId) =>
+
     return (
         <>
             <h1 style={{ textAlign: 'center' }}>Actions:</h1>
             <br />
-            <Button
+            {/* <Button
                 variant="contained"
                 color="primary"
                 size="small"
@@ -208,36 +229,45 @@ export default function Messages() {
                 }}
             >
                 Create new action
-            </Button>
-            <br />
+            </Button> */}
+            {/* <br /> */}
             {/* <Countdown date={Date.now() + 10000} onComplete={() => onCountdownComplete()} /> */}
-            <br />
-            <h3>Actions:</h3>
-            <Box display="flex">
+            {/* <br /> */}
+            <Box style={{ border: '1px solid orange' }}>
+                <h3>Event users:</h3>
+                <ul>
+                    {eventUsers.map((user) => (
+                        <li key={user.id}>{user.id}</li>
+                    ))}
+                </ul>
+            </Box>
+            <h3>Choose action:</h3>
+            <Box display="flex" style={{ border: '1px solid red' }}>
                 {actions.map((action) => (
                     <Box m={1} p={0} key={action.id}>
-                        <Paper elevation={1} className={classes.paper} style={{ padding: '10px'}}>
+                        <Paper elevation={1} className={classes.paper} style={{ padding: '10px' }} onClick={() => createAction(action.id)}>
                             <Typography variant="h6">{action.name}</Typography>
                             <Typography variant="body2">{action.description}</Typography>
                         </Paper>
                     </Box>
                 ))}
             </Box>
-            {/* <Box style={{ maxHeight: '250px', overflow: 'auto' }}>
-                {actions.map((action) => (
+            <h3>Event actions:</h3>
+            <Box style={{ maxHeight: '250px', overflow: 'auto', border: '1px solid green' }}>
+                {eventActions.map((action) => (
                     <Box key={action.id}>
                         <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
-                            Action <i>{action.actions?.name}</i> on event{' '}
+                            Action <i>{action.actions?.name}</i>, on event{' '}
                             <i>
                                 {action.events?.home_team_name} - {action.events?.visitor_team_name}
-                            </i>{' '}
-                            by user <i>{action.users?.id}</i> Participants: {action.number_participants} isCompleted? {action.is_completed ? 'Yes' : 'No'} expiredAt: {action.expired_at} expiresIn: <Countdown date={action.expired_at} onComplete={() => onCountdownComplete(action)} />&nbsp;
+                            </i>{' '},
+                            by user <i></i>, Participants: {action.number_participants}, isCompleted? {action.is_completed ? 'Yes' : 'No'}, expiredAt: {action.expired_at}, expiresIn: <Countdown date={action.expired_at} onComplete={() => onCountdownComplete(action)} />&nbsp;
                             <button onClick={() => joinAction(action.id)}>Participate</button>
                         </Paper>
                     </Box>
                 ))}
                 <div ref={actionsEndRef} />
-            </Box> */}
+            </Box>
         </>
     )
 }
