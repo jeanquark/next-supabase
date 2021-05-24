@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Auth } from '@supabase/ui'
 import Countdown from 'react-countdown'
 import Moment from 'react-moment'
-import { Grid, Typography, TextField, Button, Paper, Box, LinearProgress } from '@material-ui/core'
+import { Grid, Typography, TextField, Button, Paper, Box, LinearProgress, CircularProgress } from '@material-ui/core'
 import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
@@ -28,9 +28,26 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             cursor: 'pointer',
             background: theme.palette.primary.main,
-            color: 'white'
-        }
-    }
+            color: 'white',
+        },
+    },
+    progressBar: {
+        height: 10,
+        borderRadius: 5,
+    },
+    relative: {
+        position: 'relative',
+    },
+    bottom: {
+        color: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
+    },
+    top: {
+        position: 'absolute',
+        left: 0,
+    },
+    circle: {
+        strokeLinecap: 'round',
+    },
 }))
 
 export default function Messages() {
@@ -58,12 +75,7 @@ export default function Messages() {
         return async () => {
             const { data } = await supabase.removeSubscription(mySubscription)
             // Remove user from event
-            await supabase
-                .from('event_users')
-                .upsert(
-                    { user_id: 1, event_id: null },
-                    { onConflict: 'user_id' }
-                )
+            await supabase.from('event_users').upsert({ user_id: 1, event_id: null }, { onConflict: 'user_id' })
             console.log('Remove supabase subscription by useEffect unmount. data: ', data)
         }
     }, [id])
@@ -107,8 +119,6 @@ export default function Messages() {
     //     }
     // }, [deleteAction])
 
-
-
     const fetchActions = async () => {
         const { data, error } = await supabase.from('actions').select('*').order('id', true)
         console.log('data: ', data)
@@ -137,7 +147,7 @@ export default function Messages() {
 
     const calculateProgress = (number_participants, participation_threshold) => {
         console.log('calculateProgress')
-        return Math.floor(number_participants / participation_threshold * 100)
+        return Math.floor((number_participants / participation_threshold) * 100)
     }
 
     const getInitialActions = async (id) => {
@@ -162,19 +172,14 @@ export default function Messages() {
             setEventActions(actions)
 
             // 2) Add user to event
-            await supabase
-                .from('event_users')
-                .upsert(
-                    { user_id: 1, event_id: id },
-                    { onConflict: 'user_id' }
-                )
+            await supabase.from('event_users').upsert({ user_id: 1, event_id: id }, { onConflict: 'user_id' })
 
             // 3) Retrieve event users
             const { data: users, errorUsers } = await supabase.from('event_users').select('*').eq('event_id', id)
             if (errorUsers) console.log('error: ', errorUsers)
             setEventUsers(users)
 
-            // 4) Retrieve 
+            // 4) Retrieve
         }
     }
     const getActionsAndSubscribe = async (id) => {
@@ -207,7 +212,9 @@ export default function Messages() {
 
     const createAction = async (actionId) => {
         console.log('createAction')
-        const { data, error } = await supabase.from('event_actions').insert([{ event_id: id, user_id: 1, action_id: actionId, participation_threshold: calculateParticipationThreshold(), expired_at: calculateExpirationTime() }])
+        const { data, error } = await supabase
+            .from('event_actions')
+            .insert([{ event_id: id, user_id: 1, action_id: actionId, participation_threshold: calculateParticipationThreshold(), expired_at: calculateExpirationTime() }])
 
         if (error) {
             alert(error.message)
@@ -221,10 +228,12 @@ export default function Messages() {
             console.log('joinAction: ', eventActionId)
 
             // 1) Add auth user to event_actions_users table
-            const { error: error1 } = await supabase.from('event_actions_users').insert([{
-                event_action_id: eventActionId,
-                user_id: 1
-            }])
+            const { error: error1 } = await supabase.from('event_actions_users').insert([
+                {
+                    event_action_id: eventActionId,
+                    user_id: 1,
+                },
+            ])
             if (error1) {
                 throw error1
                 // console.log('error1: ', error1)
@@ -284,13 +293,56 @@ export default function Messages() {
                 {eventActions.map((eventAction) => (
                     <Box key={eventAction.id}>
                         <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
-                            Action <i>{eventAction.actions?.name}</i>, on event{' '}
-                            <i>
-                                {eventAction.events?.home_team_name} - {eventAction.events?.visitor_team_name}
-                            </i>{' '},
-                            by user <i>{eventAction.users?.full_name}</i>, Participants: {eventAction.number_participants}, isCompleted? {eventAction.is_completed ? 'Yes' : 'No'}, expiredAt: {eventAction.expired_at}, expiresIn: <Countdown date={eventAction.expired_at} onComplete={() => onCountdownComplete(eventAction)} />&nbsp;
-                            <button onClick={() => joinAction(eventAction.id)}>Participate</button><br />
-                            <LinearProgress variant="determinate" value={calculateProgress(eventAction.number_participants, eventAction.participation_threshold)} />
+                            <Grid container alignItems="center" style={{ flexGrow: 1, display: 'flex' }}>
+                                <Grid item xs={12}>
+                                    Action <i>{eventAction.actions?.name}</i> launched by {eventAction.users?.full_name}
+                                </Grid>
+                                {/* <i>
+                                    {eventAction.events?.home_team_name} - {eventAction.events?.visitor_team_name}
+                                </i>{' '}
+                                , by user <i>{eventAction.users?.full_name}</i>, Participants: {eventAction.number_participants}, isCompleted? {eventAction.is_completed ? 'Yes' : 'No'}, expiredAt:{' '}
+                                {eventAction.expired_at}, expiresIn: <Countdown date={eventAction.expired_at} onComplete={() => onCountdownComplete(eventAction)} />
+                                &nbsp;
+                                <button onClick={() => joinAction(eventAction.id)}>Participate</button>
+                                <br /> */}
+                                <Grid item xs={12} sm={6}>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        className={classes.progressBar}
+                                        value={calculateProgress(eventAction.number_participants, eventAction.participation_threshold)}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={3} align="right" style={{ verticalAlign: 'center' }}>
+                                    {/* <Box style={{ display: 'inline' }}> */}
+                                    <Box position="relative" display="inline-flex" >
+                                        <CircularProgress variant="determinate" className={classes.bottom} size={40} thickness={6} value={100} />
+                                        <CircularProgress
+                                            variant="determinate"
+                                            disableShrink
+                                            className={classes.top}
+                                            classes={{
+                                                circle: classes.circle,
+                                            }}
+                                            size={40}
+                                            thickness={6}
+                                            value={calculateProgress(eventAction.number_participants, eventAction.participation_threshold)}
+                                        />
+                                        <Box top={0} left={0} bottom={0} right={0} position="absolute" display="flex" alignItems="center" justifyContent="center">
+                                            <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
+                                                calculateProgress(eventAction.number_participants, eventAction.participation_threshold)
+                                            )}%`}</Typography>
+                                        </Box>
+                                    </Box>
+                                    {/* <Box> */}
+
+                                    {/* </Box> */}
+                                </Grid>
+                                <Grid item xs={12} sm={3}>
+                                    <Button variant="outlined" size="small" color="primary">
+                                        Join
+                                    </Button>
+                                </Grid>
+                            </Grid>
                         </Paper>
                     </Box>
                 ))}

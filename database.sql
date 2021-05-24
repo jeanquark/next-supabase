@@ -161,6 +161,7 @@ CREATE TABLE event_actions (
   number_participants INT DEFAULT 1,
   participation_threshold INT,
   is_completed BOOLEAN DEFAULT FALSE,
+  points INT DEFAULT 0,
   expired_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   inserted_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -195,19 +196,8 @@ BEGIN
 		UPDATE event_actions
     SET is_completed = true
 		WHERE id = new.id;
-    -- PERFORM distribute_action_points(new.id);
-    -- EXECUTE FUNCTION distribute_action_points();
-    -- EXECUTE PROCEDURE distribute_action_points(new.id);
-    -- UPDATE users SET points = 10 WHERE id = 1
     -- 2) Update user points
-    -- FOR r IN SELECT * FROM event_actions_users
-    -- WHERE event_action_id = new.id
-    -- LOOP
-    --     -- can do some processing here
-    --     UPDATE users SET points = 10 WHERE id = r.user_id;
-    -- END LOOP;
-    -- UPDATE users SET points = 20 WHERE id IN (1)
-    UPDATE users SET points = 30 WHERE id IN (SELECT user_id FROM event_actions_users WHERE event_action_id = new.id);
+    UPDATE users SET points = points + new.points WHERE id IN (SELECT user_id FROM event_actions_users WHERE event_action_id = new.id);
 	END IF;
   RETURN new;
 END;
@@ -216,24 +206,6 @@ CREATE TRIGGER participation_threshold
     AFTER UPDATE OF number_participants ON event_actions
     FOR EACH ROW
     EXECUTE PROCEDURE check_participation_threshold();
-
-/* Distribute action points function*/
--- CREATE OR REPLACE FUNCTION distribute_action_points (eventActionId int) 
--- RETURNS void AS
--- $$
---   UPDATE users
---   SET points = 10
---   WHERE id = 1
--- $$ 
--- LANGUAGE SQL volatile;
-
-
--- CREATE OR REPLACE FUNCTION public.distribute_action_points() 
--- RETURNS TRIGGER AS $$
--- BEGIN
--- 	UPDATE users SET points = 10 WHERE id = 1;
--- END;
--- $$ LANGUAGE plpgsql SECURITY definer;
 
 
 

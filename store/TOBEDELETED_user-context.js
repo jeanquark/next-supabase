@@ -13,6 +13,7 @@ export const UserContextProvider = (props) => {
     const [user, setUser] = useState(null)
 
     useEffect(() => {
+        console.log('[useEffect] user-context')
         const session = supabaseClient.auth.session()
         setSession(session)
         setUser(session?.user ?? null)

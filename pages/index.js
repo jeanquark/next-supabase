@@ -111,7 +111,7 @@ export default function index() {
 				<Grid item xs={false} sm={4} md={7} className={classes.image}>
 					<Grid container spacing={0} direction="column" alignItems="center" justify="center" style={{ minHeight: '100vh' }}>
 						<Grid item xs={3}>
-							<Link href="/fixtures" passHref>
+							<Link href="/euro2020" passHref>
 								<Button component="a" variant="contained" color="primary">
 									enter as guest
                                 </Button>

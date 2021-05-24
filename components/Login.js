@@ -84,7 +84,7 @@ const googleOAuthHandler = async () => {
         },
         {
             // redirectTo: 'http://localhost:3000/fixtures',
-            redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/fixtures`
+            redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/euro2020`
         }
     )
     console.log('user: ', user)
@@ -123,7 +123,7 @@ export default function Login(props) {
                 return
             }
             console.log('user: ', user)
-            router.push('/fixtures')
+            router.push('/euro2020')
         } catch (error) {
             console.log('error: ', error)
         }

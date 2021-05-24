@@ -13,9 +13,6 @@ import Moment from 'react-moment'
 import { Router } from 'next/router'
 
 const useStyles = makeStyles((theme) => ({
-    // root: {
-    //     flexGrow: 1,
-    // },
     root: {
         display: 'flex',
         '& > *': {
@@ -56,7 +53,6 @@ export default function euro2020() {
     const router = useRouter()
     const [fixtures, setFixtures] = useState([])
     const [fixturesByGroup, setFixturesByGroup] = useState([[]])
-    // const [standings, setStandings] = useState([])
     const [standingsByGroup, setStandingsByGroup] = useState([[]])
     const [country, setCountry] = useState('europe-uefa-euro2020')
 

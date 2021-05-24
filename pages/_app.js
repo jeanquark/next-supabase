@@ -6,17 +6,30 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import theme from '../src/theme'
 import { Auth } from '@supabase/ui'
 import { supabase } from '../lib/initSupabase'
+// import { TestWrapper } from '../store/test-context'
+import { UserWrapper } from '../store/userContext'
 
 export default function MyApp(props) {
     const { Component, pageProps } = props
+    const { user, session } = Auth.useUser()
 
     React.useEffect(() => {
+        console.log('[useEffect] _app.js')
+        // console.log('user: ', user)
+        // if (user) {
+        //     supabase
+        //         .from(`users:id=eq.${user.id}`)
+        //         .subscribe()
+        // }
+
         // Remove the server-side injected CSS.
         const jssStyles = document.querySelector('#jss-server-side')
         if (jssStyles) {
             jssStyles.parentElement.removeChild(jssStyles)
         }
     }, [])
+
+    // React.useEffect(() => {console.log('[useEffect] _app.js user: ', user)}, [user])
 
     return (
         <React.Fragment>
@@ -28,7 +41,9 @@ export default function MyApp(props) {
                 <ThemeProvider theme={theme}>
                     {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                     <CssBaseline />
-                    <Component {...pageProps} />
+                        <UserWrapper supabaseClient={supabase}>
+                            <Component {...pageProps} />
+                        </UserWrapper>
                 </ThemeProvider>
             </Auth.UserContextProvider>
         </React.Fragment>

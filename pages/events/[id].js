@@ -1,16 +1,23 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/initSupabase'
+import Head from 'next/head'
 import { Auth } from '@supabase/ui'
 import { makeStyles } from '@material-ui/core/styles'
 import Link from 'next/link'
 import EventDetails from '../../components/EventDetails'
 import MessageList from '../../components/MessageList'
 import ActionList from '../../components/ActionList'
-import Navbar from '../../components/Navbar_ORIGINAL'
+import Navbar from '../../components/Navbar'
 import { Container, Grid, AppBar, Toolbar, Box, Button, Typography, IconButton, Menu, MenuItem } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        display: 'flex',
+        '& > *': {
+            margin: theme.spacing(1),
+        },
+    },
     container: {
         paddingLeft: theme.spacing(5),
         paddingRight: theme.spacing(5),
@@ -123,7 +130,11 @@ const Event = () => {
     // }
 
     return (
-        <>
+        <div className={classes.root}>
+        <Head>
+                <title>Euro 2020</title>
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
             <Navbar title={`Event ${id}`} links={['euro2020', 'fixtures', 'admin']} />
 
             <Container className={classes.container}>
@@ -138,7 +149,7 @@ const Event = () => {
                     </Grid>
                 </Grid>
             </Container>
-        </>
+        </div>
     )
 }
 
