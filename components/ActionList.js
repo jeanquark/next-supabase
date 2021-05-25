@@ -318,7 +318,6 @@ export default function Messages() {
                                         <CircularProgress variant="determinate" className={classes.bottom} size={40} thickness={6} value={100} />
                                         <CircularProgress
                                             variant="determinate"
-                                            disableShrink
                                             className={classes.top}
                                             classes={{
                                                 circle: classes.circle,

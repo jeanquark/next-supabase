@@ -131,7 +131,7 @@ const Event = () => {
 
     return (
         <div className={classes.root}>
-        <Head>
+            <Head>
                 <title>Euro 2020</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>

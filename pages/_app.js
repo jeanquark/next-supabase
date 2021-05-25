@@ -7,7 +7,8 @@ import theme from '../src/theme'
 import { Auth } from '@supabase/ui'
 import { supabase } from '../lib/initSupabase'
 // import { TestWrapper } from '../store/test-context'
-import { UserWrapper } from '../store/userContext'
+// import { UserWrapper } from '../store/userContext'
+import { UserContextProvider } from '../store/userContext'
 
 export default function MyApp(props) {
     const { Component, pageProps } = props
@@ -15,12 +16,6 @@ export default function MyApp(props) {
 
     React.useEffect(() => {
         console.log('[useEffect] _app.js')
-        // console.log('user: ', user)
-        // if (user) {
-        //     supabase
-        //         .from(`users:id=eq.${user.id}`)
-        //         .subscribe()
-        // }
 
         // Remove the server-side injected CSS.
         const jssStyles = document.querySelector('#jss-server-side')
@@ -41,9 +36,11 @@ export default function MyApp(props) {
                 <ThemeProvider theme={theme}>
                     {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                     <CssBaseline />
-                        <UserWrapper supabaseClient={supabase}>
-                            <Component {...pageProps} />
-                        </UserWrapper>
+                    {/* <UserWrapper supabaseClient={supabase}> */}
+                    <UserContextProvider supabase={supabase}>
+                        <Component {...pageProps} />
+                    </UserContextProvider>
+                    {/* </UserWrapper> */}
                 </ThemeProvider>
             </Auth.UserContextProvider>
         </React.Fragment>

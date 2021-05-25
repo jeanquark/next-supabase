@@ -1,28 +1,52 @@
-import React, { useEffect, useState, createContext, useContext } from 'react'
-import { Auth } from '@supabase/ui'
+import { createContext, useState, useEffect } from 'react'
 
-const UserContext = createContext()
+const UserContext = createContext({
+    user: {}
+});
 
-export const UserWrapper = (props) => {
-    const { supabaseClient } = props
-    // const { user, session } = Auth.useUser()
-    const [user, setUser] = useState(null)
+export function UserContextProvider(props) {
+    const [user, setUser] = useState(null);
+
     useEffect(async () => {
-        console.log('[userContext] userWrapper ')
-        const session = supabaseClient.auth.session()
-        // console.log('[useEffect] userWrapper session: ', session)
-        // console.log('[useEffect] userWrapper session.user.id: ', session?.user?.id)
+        console.log('[userContext] useEffect userContextProvider')
+        setUserHandler()
+        // const { supabase } = props
+        // const session = supabase.auth.session()
+        // const authUser = session?.user
+        // console.log('[userContext] authUser: ', authUser)
+        // if (authUser) {
+        //     const { data, error } = await supabase.from('users').select('*').eq('auth_user_id', authUser.id)
+        //     if (error) {
+        //         console.log('error: ', error)
+        //         return
+        //     }
+        //     // console.log('[userContext] data: ', data)
+        //     setUser(data[0])
+        //     supabase
+        //         .from(`users:auth_user_id=eq.${authUser.id}`)
+        //         .on('*', (payload) => {
+        //             console.log('[userContext] User data change received!', payload)
+        //             setUser(payload.new)
+        //         })
+        //         .subscribe()
+        // }
+    }, [])
+
+    async function setUserHandler() {
+        console.log('[userContext] setUserHandler')
+        const { supabase } = props
+        const session = supabase.auth.session()
         const authUser = session?.user
         console.log('[userContext] authUser: ', authUser)
         if (authUser) {
-            const { data, error } = await supabaseClient.from('users').select('*').eq('auth_user_id', authUser.id)
+            const { data, error } = await supabase.from('users').select('*').eq('auth_user_id', authUser.id)
             if (error) {
                 console.log('error: ', error)
                 return
             }
-            // console.log('data: ', data)
+            // console.log('[userContext] data: ', data)
             setUser(data[0])
-            supabaseClient
+            supabase
                 .from(`users:auth_user_id=eq.${authUser.id}`)
                 .on('*', (payload) => {
                     console.log('[userContext] User data change received!', payload)
@@ -30,15 +54,23 @@ export const UserWrapper = (props) => {
                 })
                 .subscribe()
         }
-    }, [])
-    console.log('[userContext] user: ', user)
-    return <UserContext.Provider value={user} {...props} />
+    }
+
+    const context = {
+        user,
+        setUser: setUserHandler
+        // user: {
+        //     email: 'jm.kleger@ik.me',
+        //     firstname: 'Jean-Marc',
+        //     points: 10
+        // }
+    };
+
+    return (
+        <UserContext.Provider value={context}>
+            {props.children}
+        </UserContext.Provider>
+    );
 }
 
-export const useUserContext = () => {
-    const context = useContext(UserContext)
-    if (context === undefined) {
-        throw new Error(`useUserContext must be used within a UserWrapper.`)
-    }
-    return context
-}
+export default UserContext;

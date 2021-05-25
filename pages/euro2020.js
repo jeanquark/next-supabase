@@ -145,7 +145,7 @@ export default function euro2020() {
                         <Grid item xs={12}>
                             <Box mt={4} mb={1}>
                                 <Typography gutterBottom variant="h5" className={classes.typography}>
-                                    Groups phase
+                                    Group phase
                             </Typography>
                             </Box>
                         </Grid>

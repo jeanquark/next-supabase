@@ -2,7 +2,7 @@ import React from 'react'
 import useSWR from 'swr'
 import { Auth } from '@supabase/ui'
 import { supabase } from '../lib/initSupabase'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { Router, useRouter } from 'next/router'
@@ -19,6 +19,8 @@ import Grid from '@material-ui/core/Grid'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
+import { UserWrapper } from '../store/userContext'
+import UserContext from '../store/userContext'
 
 function Copyright() {
     return (
@@ -101,11 +103,17 @@ export default function Login(props) {
             message: '',
         },
     })
+    const userContext = useContext(UserContext)
 
     const signInUser = async (event) => {
         try {
             event.preventDefault()
             console.log('signInUser: ', event)
+            // userContext.setUser({
+            //     firstname: 'Jean-Marc',
+            //     email: 'jm.kleger@ik.me',
+            //     points: 10
+            // })
 
             let { user, error } = await supabase.auth.signIn({
                 email: event.target.email.value,
@@ -123,6 +131,7 @@ export default function Login(props) {
                 return
             }
             console.log('user: ', user)
+            userContext.setUser()
             router.push('/euro2020')
         } catch (error) {
             console.log('error: ', error)

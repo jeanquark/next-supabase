@@ -48,7 +48,7 @@ const fetcher = (url, token) =>
 export async function getServerSideProps({ req }) {
 	// console.log('getServerSideProps req: ', req)
 	const { user } = await supabase.auth.api.getUserByCookie(req)
-	console.log('getServerSideProps user: ', user)
+	console.log('[index] getServerSideProps user: ', user)
 	if (user) {
 		// If no user, redirect to index.
 		return { props: {}, redirect: { destination: '/euro2020', permanent: false } }
@@ -76,7 +76,7 @@ export default function index() {
 
 	useEffect(() => {
 		const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-			console.log('onAuthStateChange event: ', event)
+			console.log('[index] onAuthStateChange event: ', event)
 			if (event === 'PASSWORD_RECOVERY') setAuthView('update_password')
 			if (event === 'USER_UPDATED') setTimeout(() => setAuthView('sign_in'), 1000)
 			// Send session to /api/auth route to set the auth cookie.
