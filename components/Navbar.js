@@ -106,24 +106,31 @@ export default function Navbar() {
 	// const user = useUserContext()
 	const { user } = useContext(UserContext)
 
-	// useEffect(() => {
-	// 	const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-	// 		console.log('[Navbar] useEffect onAuthStateChange event: ', event)
+	useEffect(() => {
+		const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+			console.log('[index] onAuthStateChange event: ', event)
+			if (event === 'PASSWORD_RECOVERY') setAuthView('update_password')
+			if (event === 'USER_UPDATED') setTimeout(() => setAuthView('sign_in'), 1000)
+			// Send session to /api/auth route to set the auth cookie.
+			// NOTE: this is only needed if you're doing SSR (getServerSideProps)!
+			fetch('/api/auth', {
+				method: 'POST',
+				headers: new Headers({ 'Content-Type': 'application/json' }),
+				credentials: 'same-origin',
+				body: JSON.stringify({ event, session }),
+			})
+				.then((res) => res.json())
+			// .then(() => {
+			// 	if (event === 'SIGNED_IN') {
+			// 		router.push('/fixtures')
+			// 	}
+			// })
+		})
 
-	// 		// Send session to /api/auth route to set the auth cookie.
-	// 		// NOTE: this is only needed if you're doing SSR (getServerSideProps)!
-	// 		fetch('/api/auth', {
-	// 			method: 'POST',
-	// 			headers: new Headers({ 'Content-Type': 'application/json' }),
-	// 			credentials: 'same-origin',
-	// 			body: JSON.stringify({ event, session }),
-	// 		}).then((res) => res.json())
-	// 	})
-
-	// 	return () => {
-	// 		authListener.unsubscribe()
-	// 	}
-	// }, [])
+		return () => {
+			authListener.unsubscribe()
+		}
+	}, [])
 
 	const handleDrawerOpen = () => {
 		setOpen(true)
@@ -134,17 +141,13 @@ export default function Navbar() {
 	}
 
 	const handleLogout = async () => {
-		// e.preventDefault()
 		console.log('handleLogout')
 		let { error } = await supabase.auth.signOut()
 		if (error) {
 			console.log('error: ', error)
 			return
 		}
-
-		// console.log('[Navbar] abc')
-		// router.push('/')
-		// router.push('/api/logout')
+		router.push('/')
 	}
 
 	return (

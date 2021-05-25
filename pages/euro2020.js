@@ -24,11 +24,11 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(3),
         display: 'inline-block',
         verticalAlign: 'middle',
-        margin: '0px 1em'
+        margin: '0px 1em',
     },
     inline: {
         display: 'inline-block',
-        verticalAlign: 'middle'
+        verticalAlign: 'middle',
     },
     paper: {
         padding: theme.spacing(2),
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
         margin: 'auto',
     },
     hover: {
-        cursor: 'pointer'
+        cursor: 'pointer',
     },
     content: {
         flexGrow: 1,
@@ -121,11 +121,12 @@ export default function euro2020() {
         router.push(`/events/${link}`)
     }
 
-    const getDynamicComponent = (c) => dynamic(() => import(`../components/svg/${c}`), {
-        ssr: false,
-        loading: () => <p>Loading...</p>,
-    });
-    const DynamicComponent = getDynamicComponent(country);
+    const getDynamicComponent = (c) =>
+        dynamic(() => import(`../components/svg/${c}`), {
+            ssr: false,
+            loading: () => <p>Loading...</p>,
+        })
+    const DynamicComponent = getDynamicComponent(country)
 
     return (
         <div className={classes.root}>
@@ -133,11 +134,9 @@ export default function euro2020() {
                 <title>Euro 2020</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            {/* <Navbar2 title={'Euro 2020'} links={['admin', 'fixtures', 'test']} /> */}
             <Navbar />
 
             <Grid container alignItems="center" justify="center">
-
                 <DynamicComponent style={{}} />
 
                 <Grid item sm={12} md={12}>
@@ -146,7 +145,7 @@ export default function euro2020() {
                             <Box mt={4} mb={1}>
                                 <Typography gutterBottom variant="h5" className={classes.typography}>
                                     Group phase
-                            </Typography>
+                                </Typography>
                             </Box>
                         </Grid>
                         <Grid
@@ -170,25 +169,31 @@ export default function euro2020() {
                                         <Table aria-label="simple table" size="small">
                                             <TableBody>
                                                 {fixturesByGroup[index]?.map((fixture, index) => (
-
                                                     <TableRow key={index} hover className={classes.hover} onClick={() => redirectTo(fixture.id)}>
-                                                        <TableCell align="left"><Avatar className={classes.avatar} src={`/images/countries_euro2020/${fixture.home_team_id}.png`} />
+                                                        <TableCell align="left">
+                                                            <Avatar className={classes.avatar} src={`/images/countries_euro2020/${fixture.home_team_id}.png`} />
                                                             <span className={classes.inline}>{fixture.home_team_name}</span>
                                                         </TableCell>
                                                         {/* <TableCell align="center">
                                                             {fixture.home_team_score} - {fixture.visitor_team_score}
                                                         </TableCell> */}
                                                         <TableCell align="center">
-                                                            <Moment local format="DD-MM HH:mm">{fixture.date}</Moment>
+                                                            <Moment local format="DD-MM HH:mm">
+                                                                {fixture.date}
+                                                            </Moment>
                                                         </TableCell>
-                                                        <TableCell align="right"><span className={classes.inline}>{fixture.visitor_team_name}</span><Avatar className={classes.avatar} src={`/images/countries_euro2020/${fixture.visitor_team_id}.png`} /></TableCell>
+                                                        <TableCell align="right">
+                                                            <span className={classes.inline}>{fixture.visitor_team_name}</span>
+                                                            <Avatar className={classes.avatar} src={`/images/countries_euro2020/${fixture.visitor_team_id}.png`} />
+                                                        </TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
                                         </Table>
                                         {/* </NoSsr> */}
 
-                                        <br /><br />
+                                        <br />
+                                        <br />
 
                                         <Table aria-label="simple table" size="small">
                                             <TableHead>

@@ -5,6 +5,7 @@ import { supabase } from '../lib/initSupabase'
 import { makeStyles } from '@material-ui/core/styles'
 import { Auth } from '@supabase/ui'
 import Countdown from 'react-countdown'
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import Moment from 'react-moment'
 import { Grid, Typography, TextField, Button, Paper, Box, LinearProgress, CircularProgress } from '@material-ui/core'
 import moment from 'moment'
@@ -139,15 +140,22 @@ export default function Messages() {
         return moment().utc().add(10, 'minutes')
     }
 
+    const calculateProgress = (number_participants, participation_threshold) => {
+        console.log('calculateProgress')
+        return Math.floor((number_participants / participation_threshold) * 100)
+    }
+
+    const calculateRemainingTime = (expired_at) => {
+        console.log('calculateRemainingTime')
+        const abc = moment().utc().diff(expired_at, 'seconds')
+        console.log('abc: ', abc)
+        return Math.abs(abc)
+    }
+
     const onCountdownComplete = (action) => {
         console.log('onCountdownComplete() action: ', action)
         // Delete from store
         handleDeleteAction(action)
-    }
-
-    const calculateProgress = (number_participants, participation_threshold) => {
-        console.log('calculateProgress')
-        return Math.floor((number_participants / participation_threshold) * 100)
     }
 
     const getInitialActions = async (id) => {
@@ -158,7 +166,6 @@ export default function Messages() {
                 .from(`event_actions`)
                 // .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name), users (id, full_name)')
                 .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name)')
-                // .select('*')
                 .eq('event_id', id)
                 .order('id', { ascending: true })
             if (errorActions) {
@@ -305,16 +312,31 @@ export default function Messages() {
                                 &nbsp;
                                 <button onClick={() => joinAction(eventAction.id)}>Participate</button>
                                 <br /> */}
-                                <Grid item xs={12} sm={6}>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        className={classes.progressBar}
-                                        value={calculateProgress(eventAction.number_participants, eventAction.participation_threshold)}
-                                    />
+
+                                <Countdown date={eventAction.expired_at} />
+                                <Grid item xs={12} sm={6} align="center">
+                                    <Box>
+                                        <CountdownCircleTimer
+                                            isPlaying
+                                            size="50"
+                                            strokeWidth="6"
+                                            duration={calculateRemainingTime(eventAction.expired_at)}
+                                            colors={[
+                                                ['#FF4500', 0.33],
+                                                ['#19857B', 0.33],
+                                                ['#A30000', 0.33],
+                                            ]}
+                                            children={({ remainingTime }) => {
+                                                const minutes = Math.floor(remainingTime / 60)
+                                                const seconds = remainingTime % 60
+
+                                                return `${minutes}:${seconds}`
+                                            }}
+                                        ></CountdownCircleTimer>
+                                    </Box>
                                 </Grid>
                                 <Grid item xs={12} sm={3} align="right" style={{ verticalAlign: 'center' }}>
-                                    {/* <Box style={{ display: 'inline' }}> */}
-                                    <Box position="relative" display="inline-flex" >
+                                    <Box position="relative" display="inline-flex">
                                         <CircularProgress variant="determinate" className={classes.bottom} size={40} thickness={6} value={100} />
                                         <CircularProgress
                                             variant="determinate"
@@ -332,9 +354,6 @@ export default function Messages() {
                                             )}%`}</Typography>
                                         </Box>
                                     </Box>
-                                    {/* <Box> */}
-
-                                    {/* </Box> */}
                                 </Grid>
                                 <Grid item xs={12} sm={3}>
                                     <Button variant="outlined" size="small" color="primary">

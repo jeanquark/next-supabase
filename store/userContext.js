@@ -10,26 +10,6 @@ export function UserContextProvider(props) {
     useEffect(async () => {
         console.log('[userContext] useEffect userContextProvider')
         setUserHandler()
-        // const { supabase } = props
-        // const session = supabase.auth.session()
-        // const authUser = session?.user
-        // console.log('[userContext] authUser: ', authUser)
-        // if (authUser) {
-        //     const { data, error } = await supabase.from('users').select('*').eq('auth_user_id', authUser.id)
-        //     if (error) {
-        //         console.log('error: ', error)
-        //         return
-        //     }
-        //     // console.log('[userContext] data: ', data)
-        //     setUser(data[0])
-        //     supabase
-        //         .from(`users:auth_user_id=eq.${authUser.id}`)
-        //         .on('*', (payload) => {
-        //             console.log('[userContext] User data change received!', payload)
-        //             setUser(payload.new)
-        //         })
-        //         .subscribe()
-        // }
     }, [])
 
     async function setUserHandler() {
