@@ -7,8 +7,9 @@ import { Auth } from '@supabase/ui'
 import Countdown from 'react-countdown'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import Moment from 'react-moment'
-import { Grid, Typography, TextField, Button, Paper, Box, LinearProgress, CircularProgress } from '@material-ui/core'
 import moment from 'moment'
+import { Avatar, Tooltip, Grid, Typography, TextField, Button, Paper, Box, LinearProgress, CircularProgress } from '@material-ui/core'
+import DoneIcon from '@material-ui/icons/Done'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,6 +50,22 @@ const useStyles = makeStyles((theme) => ({
     circle: {
         strokeLinecap: 'round',
     },
+    "@keyframes timeOutAnimation": {
+        "0%": {
+            opacity: 1
+        },
+        "50%": {
+            opacity: 0.5
+        },
+        "100%": {
+            display: 'none',
+            opacity: 0
+        }
+    },
+    timeOut: {
+        animationName: `$timeOutAnimation`,
+        animationDuration: 5000
+    }
 }))
 
 export default function Messages() {
@@ -86,14 +103,6 @@ export default function Messages() {
         fetchActions()
     }, [])
 
-    // useEffect(() => {
-    //     console.log('[useEffect] newAction: ', newAction)
-    //     if (newAction) {
-    //         setActions((a) => [...a, newAction])
-    //         scrollToBottom()
-    //     }
-    // }, [newAction])
-
     useEffect(() => {
         try {
             console.log('[useEffect] updateAction: ', updateAction)
@@ -113,12 +122,24 @@ export default function Messages() {
         }
     }, [updateAction])
 
-    // useEffect(() => {
-    //     console.log('[useEffect] deleteAction: ', deleteAction)
-    //     if (deleteAction) {
-    //         setActions(actions.filter(a => a.id !== deleteAction.id))
-    //     }
-    // }, [deleteAction])
+    useEffect(() => {
+        try {
+            console.log('[useEffect] deleteAction: ', deleteAction)
+            if (deleteAction) {
+                const index = eventActions.findIndex((a) => a.id == deleteAction.id)
+                console.log('index: ', index)
+                let newActions = [...eventActions]
+                newActions[index]['is_timed_out'] = true
+                console.log('newActions: ', newActions)
+                setEventActions(newActions)
+                setTimeout(() => {
+                    setEventActions(eventActions.filter(a => a.id !== deleteAction.id))
+                }, 5000)
+            }
+        } catch (error) {
+            console.log('error: ', error)
+        }
+    }, [deleteAction])
 
     const fetchActions = async () => {
         const { data, error } = await supabase.from('actions').select('*').order('id', true)
@@ -135,27 +156,33 @@ export default function Messages() {
         return eventUsers.length * 0.5
     }
 
+    const calculateParticipationProgress = (number_participants, participation_threshold) => {
+        console.log('calculateParticipationProgress')
+        return Math.floor((number_participants / participation_threshold) * 100)
+    }
+
     const calculateExpirationTime = () => {
         console.log('calculateExpirationTime')
         return moment().utc().add(10, 'minutes')
     }
 
-    const calculateProgress = (number_participants, participation_threshold) => {
-        console.log('calculateProgress')
-        return Math.floor((number_participants / participation_threshold) * 100)
+    const abc = (expired_at) => {
+        setInterval(function () {
+            console.log('abc')
+        }, 1000)
+
+        return 40
     }
 
     const calculateRemainingTime = (expired_at) => {
         console.log('calculateRemainingTime')
-        const abc = moment().utc().diff(expired_at, 'seconds')
-        console.log('abc: ', abc)
-        return Math.abs(abc)
+        return Math.abs(moment().utc().diff(expired_at, 'seconds'))
     }
 
-    const onCountdownComplete = (action) => {
-        console.log('onCountdownComplete() action: ', action)
+    const onCountdownTimeout = (eventAction) => {
+        console.log('onCountdownTimeout() eventAction: ', eventAction)
         // Delete from store
-        handleDeleteAction(action)
+        handleDeleteAction(eventAction)
     }
 
     const getInitialActions = async (id) => {
@@ -164,9 +191,10 @@ export default function Messages() {
             // 1) Retrieve event actions
             const { data: actions, error: errorActions } = await supabase
                 .from(`event_actions`)
-                // .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name), users (id, full_name)')
-                .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name)')
+                .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name), users (id, username, full_name)')
+                // .select('id, number_participants, participation_threshold, expired_at, actions (name), events (home_team_name, visitor_team_name)')
                 .eq('event_id', id)
+                .gt('expired_at', moment().utc())
                 .order('id', { ascending: true })
             if (errorActions) {
                 setError(errorActions.message)
@@ -218,17 +246,25 @@ export default function Messages() {
     }
 
     const createAction = async (actionId) => {
-        console.log('createAction')
-        const { data, error } = await supabase
-            .from('event_actions')
-            .insert([{ event_id: id, user_id: 1, action_id: actionId, participation_threshold: calculateParticipationThreshold(), expired_at: calculateExpirationTime() }])
+        try {
+            console.log('createAction')
+            if (!user) {
+                alert('You must be authenticated to choose an action.')
+                return
+            }
+            const { data, error } = await supabase
+                .from('event_actions')
+                .insert([{ event_id: id, user_id: 1, action_id: actionId, participation_threshold: calculateParticipationThreshold(), expired_at: calculateExpirationTime() }])
 
-        if (error) {
-            alert(error.message)
-            return
+            if (error) {
+                alert(error.message)
+                return
+            }
+            console.log('data: ', data)
+            console.log('Successfully created action!')
+        } catch (error) {
+            console.log('error: ', error)
         }
-        console.log('data: ', data)
-        console.log('Successfully created action!')
     }
     const joinAction = async (eventActionId) => {
         try {
@@ -242,47 +278,68 @@ export default function Messages() {
                 },
             ])
             if (error1) {
+                console.log('error1: ', error1)
                 throw error1
-                // console.log('error1: ', error1)
-                // setError(error1.message)
-                return
             }
 
             // 2) Increment counter
             const { error2 } = await supabase.rpc('increment_participation_count_by_one', { row_id: parseInt(eventActionId) })
             if (error2) {
+                console.log('error2: ', error2)
                 throw error2
-                // console.log('error2: ', error2)
             }
         } catch (error) {
             console.log('error from joinAction: ', error)
         }
     }
 
+    function joinButton(eventAction) {
+        if (eventAction.is_timed_out) {
+            return <Button variant="outlined" size="small" color="primary" disabled={true}>
+                Time out
+            </Button>
+        } else if (eventAction.is_completed) {
+            return <Button variant="outlined" size="small" color="primary" disabled={true} endIcon={<DoneIcon />}>
+                Completed
+            </Button>
+        } else if (!user) {
+            return <><Button variant="outlined" size="small" color="primary" disabled={true}>
+                Join
+            </Button><Button size="small" color="primary">Login first</Button></>
+        } else {
+            return <Button variant="outlined" size="small" color="primary" onClick={() => joinAction(eventAction.id)}>
+                Join
+            </Button>
+        }
+    }
+
+    function LinearProgressWithLabel(props) {
+        return (
+            <Box display="flex" alignItems="center">
+                <Box width="100%" mr={1}>
+                    <LinearProgress variant="determinate" style={{ height: 10, borderRadius: 20 }} {...props} />
+                </Box>
+                <Box minWidth={35}>
+                    <Typography variant="body2" color="textSecondary">{`${Math.round(
+                        props.value,
+                    )}%`}</Typography>
+                </Box>
+            </Box>
+        );
+    }
+
+
     return (
         <>
             <h1 style={{ textAlign: 'center' }}>Actions:</h1>
             <br />
-            {/* <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                onClick={() => {
-                    createAction()
-                }}
-            >
-                Create new action
-            </Button> */}
-            {/* <br /> */}
-            {/* <Countdown date={Date.now() + 10000} onComplete={() => onCountdownComplete()} /> */}
-            {/* <br /> */}
             <Box style={{ border: '1px solid orange' }}>
                 <h3>Event users:</h3>
-                <ul>
-                    {eventUsers.map((user) => (
-                        <li key={user.id}>{user.id}</li>
-                    ))}
-                </ul>
+                {eventUsers.map((user) => (
+                    <Tooltip title={user.username} key={user.id}>
+                        <Avatar alt={user.username} src={`/images/avatar.png`} />
+                    </Tooltip>
+                ))}
             </Box>
             <h3>Choose action:</h3>
             <Box display="flex" style={{ border: '1px solid red' }}>
@@ -299,19 +356,11 @@ export default function Messages() {
             <Box style={{ maxHeight: '250px', overflow: 'auto', border: '1px solid green' }}>
                 {eventActions.map((eventAction) => (
                     <Box key={eventAction.id}>
-                        <Paper elevation={3} style={{ margin: 10, padding: 8 }}>
+                        <Paper elevation={3} className={eventAction.is_timed_out && classes.timeOut} style={{ margin: 10, padding: 8 }}>
                             <Grid container alignItems="center" style={{ flexGrow: 1, display: 'flex' }}>
                                 <Grid item xs={12}>
-                                    Action <i>{eventAction.actions?.name}</i> launched by {eventAction.users?.full_name}
+                                    Action <b>{eventAction.actions?.name}</b> launched by <b>{eventAction.users?.username}</b> <Moment fromNow>{eventAction.created_at}</Moment>
                                 </Grid>
-                                {/* <i>
-                                    {eventAction.events?.home_team_name} - {eventAction.events?.visitor_team_name}
-                                </i>{' '}
-                                , by user <i>{eventAction.users?.full_name}</i>, Participants: {eventAction.number_participants}, isCompleted? {eventAction.is_completed ? 'Yes' : 'No'}, expiredAt:{' '}
-                                {eventAction.expired_at}, expiresIn: <Countdown date={eventAction.expired_at} onComplete={() => onCountdownComplete(eventAction)} />
-                                &nbsp;
-                                <button onClick={() => joinAction(eventAction.id)}>Participate</button>
-                                <br /> */}
 
                                 <Countdown date={eventAction.expired_at} />
                                 <Grid item xs={12} sm={6} align="center">
@@ -332,33 +381,38 @@ export default function Messages() {
 
                                                 return `${minutes}:${seconds}`
                                             }}
-                                        ></CountdownCircleTimer>
+                                            onComplete={() => onCountdownTimeout(eventAction)}
+                                        />
                                     </Box>
                                 </Grid>
                                 <Grid item xs={12} sm={3} align="right" style={{ verticalAlign: 'center' }}>
                                     <Box position="relative" display="inline-flex">
-                                        <CircularProgress variant="determinate" className={classes.bottom} size={40} thickness={6} value={100} />
+                                        <CircularProgress variant="determinate" className={classes.bottom} size={60} thickness={5} value={100} />
                                         <CircularProgress
                                             variant="determinate"
                                             className={classes.top}
                                             classes={{
                                                 circle: classes.circle,
                                             }}
-                                            size={40}
-                                            thickness={6}
-                                            value={calculateProgress(eventAction.number_participants, eventAction.participation_threshold)}
+                                            size={60}
+                                            thickness={5}
+                                            // value={calculateParticipationProgress(eventAction.number_participants, eventAction.participation_threshold)}
+                                            value={40}
                                         />
                                         <Box top={0} left={0} bottom={0} right={0} position="absolute" display="flex" alignItems="center" justifyContent="center">
                                             <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
-                                                calculateProgress(eventAction.number_participants, eventAction.participation_threshold)
-                                            )}%`}</Typography>
+                                                calculateRemainingTime(eventAction.expired_at)
+                                            )}s`}</Typography>
                                         </Box>
                                     </Box>
                                 </Grid>
                                 <Grid item xs={12} sm={3}>
-                                    <Button variant="outlined" size="small" color="primary">
-                                        Join
-                                    </Button>
+                                    {joinButton(eventAction)}
+
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <LinearProgressWithLabel value={Math.round(
+                                        calculateParticipationProgress(eventAction.number_participants, eventAction.participation_threshold))} />
                                 </Grid>
                             </Grid>
                         </Paper>
