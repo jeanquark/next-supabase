@@ -188,7 +188,7 @@ export default function europe({ onSelectCountry }) {
                         <Grid item xs={12}>
                             {stadium && stadium.slug && <img src={`/images/stadiums_euro2020/${stadium.slug}.jpg`} width="100%" />}
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} align="left">
                             <Chip label={`${stadium.country}`} color="primary" size="small" className={classes.chip} />
                             <Chip label={stadium.capacity} color="secondary" size="small" icon={<FaceIcon />} className={classes.chip} />
                         </Grid>

@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
         color: 'red',
         textDecoration: 'none',
     },
+    toolbar: theme.mixins.toolbar,
 }))
 
 const Event = () => {
@@ -137,7 +138,7 @@ const Event = () => {
             </Head>
             <Navbar title={`Event ${id}`} links={['euro2020', 'fixtures', 'admin']} />
 
-            <Container className={classes.container}>
+            <Container className={classes.toolbar}>
                 <Grid container spacing={0}>
                     <Grid item xs={12} sm={6}>
                         {/* <EventDetails /> */}

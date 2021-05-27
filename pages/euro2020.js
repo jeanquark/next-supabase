@@ -4,13 +4,14 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { makeStyles } from '@material-ui/core/styles'
-import { Avatar, Container, Grid, Box, Paper, Typography, Toolbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, NoSsr } from '@material-ui/core'
+import { Avatar, Container, Card, CardActionArea, CardMedia, CardContent, Grid, Box, Paper, Typography, Toolbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, NoSsr } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
 import NavbarOriginal from '../components/Navbar_ORIGINAL'
 import Navbar from '../components/Navbar'
 import dynamic from 'next/dynamic'
 import Moment from 'react-moment'
 import { Router } from 'next/router'
+import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -19,12 +20,26 @@ const useStyles = makeStyles((theme) => ({
             margin: theme.spacing(1),
         },
     },
+    flag: {
+        display: 'flex',
+        '& > *': {
+            marginTop: theme.spacing(2),
+            marginLeft: theme.spacing(1),
+            marginRight: theme.spacing(1),
+            width: theme.spacing(7),
+            height: theme.spacing(4),
+        },
+    },
+    media: {
+        // height: 60,
+        textAlign: 'center',
+    },
     avatar: {
         width: theme.spacing(3),
         height: theme.spacing(3),
         display: 'inline-block',
         verticalAlign: 'middle',
-        margin: '0px 1em',
+        margin: '0em 1em',
     },
     inline: {
         display: 'inline-block',
@@ -46,6 +61,8 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         padding: theme.spacing(3),
     },
+    toolbar: theme.mixins.toolbar,
+
 }))
 
 export default function euro2020() {
@@ -53,6 +70,7 @@ export default function euro2020() {
     const router = useRouter()
     const [fixtures, setFixtures] = useState([])
     const [fixturesByGroup, setFixturesByGroup] = useState([[]])
+    const [nextFixtures, setNextFixtures] = useState([])
     const [standingsByGroup, setStandingsByGroup] = useState([[]])
     const [country, setCountry] = useState('europe-uefa-euro2020')
 
@@ -69,6 +87,14 @@ export default function euro2020() {
         else {
             console.log('fixtures: ', fixtures)
             setFixtures(fixtures)
+            const nextFixtures = fixtures.filter((fixture) => moment(fixture.date).format('YYYY-MM-DD') >= moment().utc().format('YYYY-MM-DD')).slice(0, 3)
+            console.log('nextFixtures: ', nextFixtures)
+            setNextFixtures(nextFixtures)
+            // const abc = moment(nextFixtures[0]['date']).format('YYYY-MM-DD')
+            // console.log('abc: ', abc)
+            // const def = moment().utc().format('YYYY-MM-DD')
+            // console.log('def: ', def)
+            // console.log('diff: ', abc < def)
             const array = [[]]
             let index
             const groupIndexHashObject = {
@@ -126,6 +152,7 @@ export default function euro2020() {
             ssr: false,
             loading: () => <p>Loading...</p>,
         })
+
     const DynamicComponent = getDynamicComponent(country)
 
     return (
@@ -136,8 +163,47 @@ export default function euro2020() {
             </Head>
             <Navbar />
 
-            <Grid container alignItems="center" justify="center">
-                <DynamicComponent style={{}} />
+            <Grid container alignItems="center" justify="center" className={classes.toolbar} style={{ paddingTop: '0px', marginTop: '0px', border: '2px solid red' }}>
+                <Grid container item style={{ border: '2px solid green' }}>
+                    {/* <Grid item > */}
+                        <Grid container item direction="column" justify="space-around" sm={12} md={3} style={{ border: '2px solid pink' }}>
+                            {nextFixtures.map((fixture) => (
+                                <Box my={5} key={fixture.id}>
+                                    <Link href={`/events/${fixture.id}`}>
+                                        <Card>
+                                            <CardActionArea>
+                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                    <CardMedia className={classes.media} title="Flags">
+                                                        <div className={classes.flag}>
+                                                            <Avatar variant="square" alt="Country flag" src={fixture.home_team_image} />
+                                                            <Avatar variant="square" alt="Country flag" src={fixture.visitor_team_image} className={classes.small} />
+                                                        </div>
+                                                    </CardMedia>
+                                                </div>
+                                                <CardContent style={{}}>
+                                                    <Typography gutterBottom variant="h6" component="h3" className={classes.typography}>
+                                                        {fixture.home_team_name} - {fixture.visitor_team_name}
+                                                    </Typography>
+
+                                                    <Typography variant="body2" color="textSecondary" component="p">
+                                                        {fixture.venue_name}, {fixture.city}.
+                                                </Typography>
+                                                    <Typography variant="caption" color="textPrimary" component="p">
+                                                        <Moment format="ddd Do MMM YYYY HH:mm">{fixture.date}</Moment>
+                                                    </Typography>
+                                                </CardContent>
+                                            </CardActionArea>
+                                        </Card>
+                                    </Link>
+                                </Box>
+                            ))}
+                        </Grid>
+                    {/* </Grid> */}
+
+                    <Grid item sm={12} md={9} align="right">
+                        <DynamicComponent style={{}} />
+                    </Grid>
+                </Grid>
 
                 <Grid item sm={12} md={12}>
                     <Grid container>

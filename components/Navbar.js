@@ -16,6 +16,9 @@ import Divider from '@material-ui/core/Divider'
 import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
+import Menu from '@material-ui/core/menu'
+import MenuItem from '@material-ui/core/MenuItem'
+import LoyaltyIcon from '@material-ui/icons/Loyalty'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ListItem from '@material-ui/core/ListItem'
@@ -24,6 +27,9 @@ import ListItemText from '@material-ui/core/ListItemText'
 import PeopleIcon from '@material-ui/icons/People'
 import SportsSoccerIcon from '@material-ui/icons/SportsSoccer'
 import Avatar from '@material-ui/core/Avatar'
+import Badge from '@material-ui/core/Badge'
+import Box from '@material-ui/core/Box'
+import AccountCircle from '@material-ui/icons/AccountCircle'
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle'
 // import { useTestContext } from '../store/test-context'
 // import { useUserContext } from '../store/userContext'
@@ -33,7 +39,7 @@ const drawerWidth = 240
 
 const useStyles = makeStyles((theme) => ({
 	root: {
-		display: 'flex',
+		display: 'flex'
 	},
 	appBar: {
 		zIndex: theme.zIndex.drawer + 1,
@@ -52,6 +58,9 @@ const useStyles = makeStyles((theme) => ({
 	},
 	menuButton: {
 		marginRight: 36,
+	},
+	title: {
+		flexGrow: 1,
 	},
 	hide: {
 		display: 'none',
@@ -102,9 +111,18 @@ export default function Navbar() {
 	const classes = useStyles()
 	const theme = useTheme()
 	const [open, setOpen] = React.useState(false)
+	const [anchorEl, setAnchorEl] = React.useState(null)
 	// const { user, session } = Auth.useUser()
 	// const user = useUserContext()
 	const { user } = useContext(UserContext)
+	const openAnchorEl = Boolean(anchorEl)
+
+	const handleMenu = (event) => {
+		setAnchorEl(event.currentTarget)
+	}
+	const handleClose = () => {
+		setAnchorEl(null)
+	}
 
 	useEffect(() => {
 		const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
@@ -171,9 +189,44 @@ export default function Navbar() {
 					>
 						<MenuIcon />
 					</IconButton>
-					<Typography variant="h6" noWrap>
-						ThisIsFan user.id: {user?.id} points: {user?.points}
+					<Typography variant="h6" noWrap className={classes.title}>
+						ThisIsFan
 					</Typography>
+					{user && <>
+						<Box mx={2}>
+							<Badge badgeContent={user?.points} max={100} color="secondary">
+								<LoyaltyIcon />
+							</Badge>
+						</Box>
+						<IconButton
+							aria-label="account of current user"
+							aria-controls="menu-appbar"
+							aria-haspopup="true"
+							color="secondary"
+							onClick={handleMenu}
+						>
+							<Avatar alt={user.email} src="/images/avatar.png" />
+						</IconButton>
+						<Menu
+							id="menu-appbar"
+							anchorEl={anchorEl}
+							anchorOrigin={{
+								vertical: 'top',
+								horizontal: 'right',
+							}}
+							keepMounted
+							transformOrigin={{
+								vertical: 'top',
+								horizontal: 'right',
+							}}
+							open={openAnchorEl}
+							onClose={handleClose}
+						>
+							<MenuItem>Profile</MenuItem>
+							<MenuItem>My account</MenuItem>
+							<MenuItem>Logout</MenuItem>
+						</Menu>
+					</>}
 				</Toolbar>
 			</AppBar>
 			<Drawer

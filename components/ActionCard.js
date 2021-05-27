@@ -19,6 +19,8 @@ import ButtonBase from '@material-ui/core/ButtonBase'
 import LinearProgress from '@material-ui/core/LinearProgress'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
+import Avatar from '@material-ui/core/Avatar'
+import Tooltip from '@material-ui/core/Tooltip'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -122,7 +124,7 @@ export default function ActionCard({ eventAction }) {
                         Join
                     </Button>
                     <Button size="small" color="primary">
-                        Login first to join
+                        Login to participate
                     </Button>
                 </>
             )
@@ -147,36 +149,40 @@ export default function ActionCard({ eventAction }) {
                     <Grid item xs={10} sm container alignItems="center">
                         <Grid item xs container direction="column" spacing={2}>
                             <Grid item xs>
-                                <Typography gutterBottom variant="subtitle1">
+                                {/* <Typography gutterBottom variant="subtitle1">
                                     Action <b>{eventAction.actions?.name}</b> launched by <b>{eventAction.users?.username}</b> <Moment fromNow>{eventAction.created_at}</Moment>
-                                </Typography>
+                                </Typography> */}
+
+                                <Tooltip title={eventAction.users?.username}>
+                                    <Avatar alt={eventAction.users?.username} src={`/images/avatar.png`} />
+                                </Tooltip>
 
                                 <LinearProgressWithLabel value={Math.round(calculateParticipationProgress(eventAction.number_participants, eventAction.participation_threshold))} />
                             </Grid>
                             <Grid item>
-                            {joinButton(eventAction)}
+                                {joinButton(eventAction)}
                             </Grid>
                         </Grid>
                         <Grid item>
                             {/* <Box align="center"> */}
-                                <CountdownCircleTimer
-                                    isPlaying
-                                    size="50"
-                                    strokeWidth="6"
-                                    duration={calculateRemainingTime(eventAction.expired_at)}
-                                    colors={[
-                                        ['#FF4500', 0.33],
-                                        ['#19857B', 0.33],
-                                        ['#A30000', 0.33],
-                                    ]}
-                                    children={({ remainingTime }) => {
-                                        const minutes = Math.floor(remainingTime / 60)
-                                        const seconds = remainingTime % 60
+                            <CountdownCircleTimer
+                                isPlaying
+                                size="50"
+                                strokeWidth="6"
+                                duration={calculateRemainingTime(eventAction.expired_at)}
+                                colors={[
+                                    ['#FF4500', 0.33],
+                                    ['#19857B', 0.33],
+                                    ['#A30000', 0.33],
+                                ]}
+                                children={({ remainingTime }) => {
+                                    const minutes = Math.floor(remainingTime / 60)
+                                    const seconds = remainingTime % 60
 
-                                        return `${minutes}:${seconds}`
-                                    }}
-                                    onComplete={() => onCountdownTimeout(eventAction)}
-                                />
+                                    return `${minutes}:${seconds}`
+                                }}
+                                onComplete={() => onCountdownTimeout(eventAction)}
+                            />
                             {/* </Box> */}
                         </Grid>
                         <Grid item>
