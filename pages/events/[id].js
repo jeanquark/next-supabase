@@ -14,13 +14,16 @@ import { Container, Grid, AppBar, Toolbar, Box, Button, Typography, IconButton, 
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
-        '& > *': {
-            margin: theme.spacing(1),
-        },
+    },
+    appBarSpacer: theme.mixins.toolbar,
+    content: {
+        flexGrow: 1,
+        height: '100vh',
+        overflow: 'auto',
     },
     container: {
-        paddingLeft: theme.spacing(5),
-        paddingRight: theme.spacing(5),
+        paddingTop: theme.spacing(4),
+        paddingBottom: theme.spacing(4),
     },
     menuButton: {
         marginRight: theme.spacing(2),
@@ -75,7 +78,7 @@ const Event = () => {
     //             return
     //         }
     //         setActions(data)
-            
+
     //         // Add user to event
     //         await supabase
     //             .from('user_event')
@@ -110,11 +113,11 @@ const Event = () => {
     // }
 
     // useEffect(() => {
-	// 	console.log('useEffect user.id: ', user?.id)
-	// 	if (user) {
-	// 		console.log('Redirect to /fixtures')
-	// 	}
-	// }, [])
+    // 	console.log('useEffect user.id: ', user?.id)
+    // 	if (user) {
+    // 		console.log('Redirect to /fixtures')
+    // 	}
+    // }, [])
 
     // useEffect(() => {
     //     fetchEvent(id)
@@ -136,20 +139,23 @@ const Event = () => {
                 <title>Euro 2020</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Navbar title={`Event ${id}`} links={['euro2020', 'fixtures', 'admin']} />
+            <Navbar />
 
-            <Container className={classes.toolbar}>
-                <Grid container spacing={0}>
-                    <Grid item xs={12} sm={6}>
-                        {/* <EventDetails /> */}
-                        user.role: { user?.role }
+            <main className={classes.content}>
+                <div className={classes.appBarSpacer} />
+                <Container maxWidth="lg" className={classes.container}>
+                    <Grid container spacing={0}>
+                        <Grid item xs={12} sm={6}>
+                            {/* <EventDetails /> */}
+                            user.role: {user?.role}
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            {/* <MessageList /> */}
+                            <ActionList />
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                        {/* <MessageList /> */}
-                        <ActionList />
-                    </Grid>
-                </Grid>
-            </Container>
+                </Container>
+            </main>
         </div>
     )
 }

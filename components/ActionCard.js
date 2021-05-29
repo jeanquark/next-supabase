@@ -1,67 +1,69 @@
 import React from 'react'
-import Moment from 'react-moment'
-import moment from 'moment'
+import { useContext } from 'react'
+import { makeStyles } from '@material-ui/core/styles'
 import { supabase } from '../lib/initSupabase'
 import { Auth } from '@supabase/ui'
+import moment from 'moment'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
-import { makeStyles, useTheme } from '@material-ui/core/styles'
-import Card from '@material-ui/core/Card'
-import CardContent from '@material-ui/core/CardContent'
-import CardMedia from '@material-ui/core/CardMedia'
-import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious'
-import PlayArrowIcon from '@material-ui/icons/PlayArrow'
-import SkipNextIcon from '@material-ui/icons/SkipNext'
-import Grid from '@material-ui/core/Grid'
-import Paper from '@material-ui/core/Paper'
-import ButtonBase from '@material-ui/core/ButtonBase'
-import LinearProgress from '@material-ui/core/LinearProgress'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemAvatar from '@material-ui/core/ListItemAvatar'
+import ListItemText from '@material-ui/core/ListItemText'
+import ListSubheader from '@material-ui/core/ListSubheader'
+import Avatar from '@material-ui/core/Avatar'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
-import Avatar from '@material-ui/core/Avatar'
-import Tooltip from '@material-ui/core/Tooltip'
+import LinearProgress from '@material-ui/core/LinearProgress'
+import UserContext from '../store/userContext'
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
+    subheader: {
+        backgroundColor: theme.palette.background.paper,
     },
-    paper: {
-        padding: theme.spacing(2),
-        margin: 'auto',
-        // maxWidth: 500,
+    listItem: {
+        '&:hover': {
+            background: 'yellow'
+        }
     },
-    image: {
-        // width: 128,
-        // height: 128,
+    '@keyframes timeOutAnimation': {
+        '0%': {
+            opacity: 1,
+        },
+        '50%': {
+            opacity: 0.5,
+        },
+        '100%': {
+            display: 'none',
+            opacity: 0,
+        },
     },
-    img: {
-        margin: 'auto',
-        display: 'block',
-        maxWidth: '100%',
-        maxHeight: '100%',
+    timeOut: {
+        animationName: `$timeOutAnimation`,
+        animationDuration: 5000,
     },
 }))
 
-export default function ActionCard({ eventAction }) {
+export default function ActionCard(props) {
+    const { eventAction } = props
     const classes = useStyles()
-    const theme = useTheme()
-    const { user, session } = Auth.useUser()
+    const { user } = useContext(UserContext)
 
     const calculateRemainingTime = (expired_at) => {
         console.log('calculateRemainingTime')
         return Math.abs(moment().utc().diff(expired_at, 'seconds'))
     }
 
-    const onCountdownTimeout = (eventAction) => {
-        console.log('onCountdownTimeout() eventAction: ', eventAction)
-        // Delete from store
-        handleDeleteAction(eventAction)
-    }
-
     const calculateParticipationProgress = (number_participants, participation_threshold) => {
         console.log('calculateParticipationProgress')
         return Math.floor((number_participants / participation_threshold) * 100)
+    }
+
+    const onCountdownTimeout = (eventAction) => {
+        console.log('onCountdownTimeout() eventAction: ', eventAction)
+        // Delete from store
+        props.onDeleteAction(eventAction)
+        // handleDeleteAction(eventAction)
+        // onDeleteAction(eventAction)
     }
 
     const joinAction = async (eventActionId) => {
@@ -72,7 +74,7 @@ export default function ActionCard({ eventAction }) {
             const { error: error1 } = await supabase.from('event_actions_users').insert([
                 {
                     event_action_id: eventActionId,
-                    user_id: 1,
+                    user_id: user.id,
                 },
             ])
             if (error1) {
@@ -119,14 +121,9 @@ export default function ActionCard({ eventAction }) {
             )
         } else if (!user) {
             return (
-                <>
-                    <Button variant="outlined" size="small" color="primary" disabled={true}>
-                        Join
-                    </Button>
-                    <Button size="small" color="primary">
-                        Login to participate
-                    </Button>
-                </>
+                <Button variant="outlined" size="small" color="primary" disabled={true}>
+                    Join
+                </Button>
             )
         } else {
             return (
@@ -138,59 +135,39 @@ export default function ActionCard({ eventAction }) {
     }
 
     return (
-        <div className={classes.root}>
-            <Paper className={classes.paper}>
-                <Grid container spacing={2}>
-                    <Grid item xs={2}>
-                        <ButtonBase className={classes.image}>
-                            <img className={classes.img} alt="complex" src={`/images/actions/${eventAction.actions?.image}`} />
-                        </ButtonBase>
-                    </Grid>
-                    <Grid item xs={10} sm container alignItems="center">
-                        <Grid item xs container direction="column" spacing={2}>
-                            <Grid item xs>
-                                {/* <Typography gutterBottom variant="subtitle1">
-                                    Action <b>{eventAction.actions?.name}</b> launched by <b>{eventAction.users?.username}</b> <Moment fromNow>{eventAction.created_at}</Moment>
-                                </Typography> */}
+        <React.Fragment>
+            <ListItem className={classes.listItem}>
+                <ListItemAvatar>
+                    <Avatar alt="Profile Picture" src={`/images/actions/${eventAction.actions?.image}`} />
+                </ListItemAvatar>
+                <ListItemText primary={eventAction.actions?.name} secondary={eventAction.users?.username} />
+                <ListItemText>
+                    <LinearProgressWithLabel value={Math.round(calculateParticipationProgress(eventAction.number_participants, eventAction.participation_threshold))} />
+                </ListItemText>
+                <ListItemText>
+                    <Box align="center" style={{ paddingTop: 7 }}>
+                        <CountdownCircleTimer
+                            isPlaying
+                            size="45"
+                            strokeWidth="4"
+                            duration={calculateRemainingTime(eventAction.expired_at)}
+                            colors={[
+                                ['#ff4500', 0.33],
+                                ['#e63e00', 0.33],
+                                ['#cc3700', 0.33],
+                            ]}
+                            onComplete={() => onCountdownTimeout(eventAction)}
+                            children={({ remainingTime }) => {
+                                const minutes = Math.floor(remainingTime / 60)
+                                const seconds = remainingTime % 60 < 10 ? '0' + (remainingTime % 60) : remainingTime % 60
 
-                                <Tooltip title={eventAction.users?.username}>
-                                    <Avatar alt={eventAction.users?.username} src={`/images/avatar.png`} />
-                                </Tooltip>
-
-                                <LinearProgressWithLabel value={Math.round(calculateParticipationProgress(eventAction.number_participants, eventAction.participation_threshold))} />
-                            </Grid>
-                            <Grid item>
-                                {joinButton(eventAction)}
-                            </Grid>
-                        </Grid>
-                        <Grid item>
-                            {/* <Box align="center"> */}
-                            <CountdownCircleTimer
-                                isPlaying
-                                size="50"
-                                strokeWidth="6"
-                                duration={calculateRemainingTime(eventAction.expired_at)}
-                                colors={[
-                                    ['#FF4500', 0.33],
-                                    ['#19857B', 0.33],
-                                    ['#A30000', 0.33],
-                                ]}
-                                children={({ remainingTime }) => {
-                                    const minutes = Math.floor(remainingTime / 60)
-                                    const seconds = remainingTime % 60
-
-                                    return `${minutes}:${seconds}`
-                                }}
-                                onComplete={() => onCountdownTimeout(eventAction)}
-                            />
-                            {/* </Box> */}
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="subtitle1">$19.00</Typography>
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Paper>
-        </div>
+                                return <Typography variant="caption" style={{ paddingBottom: 5 }}>{`${minutes}:${seconds}`}</Typography>
+                            }}
+                        />
+                    </Box>
+                </ListItemText>
+                {joinButton(eventAction)}
+            </ListItem>
+        </React.Fragment>
     )
 }

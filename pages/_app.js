@@ -12,7 +12,7 @@ import { UserContextProvider } from '../store/userContext'
 
 export default function MyApp(props) {
     const { Component, pageProps } = props
-    const { user, session } = Auth.useUser()
+    // const { user, session } = Auth.useUser()
 
     React.useEffect(() => {
         console.log('[useEffect] _app.js')

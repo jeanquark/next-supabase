@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2, 2, 0),
     },
     paper: {
-        paddingBottom: 50,
+        paddingBottom: 20,
     },
     list: {
         marginBottom: theme.spacing(2),
@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
     },
     appBar: {
         top: 'auto',
-        bottom: 0,
+        bottom: 0
     },
     grow: {
         flexGrow: 1,
@@ -103,7 +103,6 @@ export default function BottomAppBar() {
 
     return (
         <React.Fragment>
-            <Box style={{ position: 'relative' }}>
             <CssBaseline />
             <Paper square className={classes.paper}>
                 <Typography className={classes.text} variant="h5" gutterBottom>
@@ -124,14 +123,14 @@ export default function BottomAppBar() {
                     ))}
                 </List>
             </Paper>
-            <AppBar position="fixed" color="primary" className={classes.appBar}>
-                <Toolbar>
+            <AppBar position="sticky" color="primary" className={classes.appBar}>
+                <Toolbar variant="dense">
                     <IconButton edge="start" color="inherit" aria-label="open drawer">
                         <MenuIcon />
                     </IconButton>
-                    {/* <Fab color="secondary" aria-label="add" className={classes.fabButton}>
+                    <Fab color="secondary" aria-label="add" className={classes.fabButton}>
                         <AddIcon />
-                    </Fab> */}
+                    </Fab>
                     <div className={classes.grow} />
                     <IconButton color="inherit">
                         <SearchIcon />
@@ -141,7 +140,6 @@ export default function BottomAppBar() {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            </Box>
         </React.Fragment>
     );
 }

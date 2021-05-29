@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
 	small: {
 		width: theme.spacing(3),
 		height: theme.spacing(3),
-	},
+	}
 }))
 
 export default function Navbar() {
@@ -229,6 +229,7 @@ export default function Navbar() {
 					</>}
 				</Toolbar>
 			</AppBar>
+			<div className={classes.appBarSeparator} />
 			<Drawer
 				variant="permanent"
 				className={clsx(classes.drawer, {
