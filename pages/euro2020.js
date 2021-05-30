@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     },
     hover: {
         cursor: 'pointer',
-    }
+    },
 }))
 
 export default function euro2020() {
@@ -193,6 +193,7 @@ export default function euro2020() {
                         <Grid container item style={{ border: '2px solid green' }}>
                             {/* <Grid item > */}
                             <Grid container item direction="column" justify="space-around" sm={12} md={3} style={{ border: '2px solid pink' }}>
+                                <Typography variant="h5" className={classes.typography}>Next fixtures</Typography>
                                 {nextFixtures.map((fixture) => (
                                     <Box my={5} key={fixture.id}>
                                         <Link href={`/events/${fixture.id}`}>

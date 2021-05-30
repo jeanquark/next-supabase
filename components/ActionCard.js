@@ -14,6 +14,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 import LinearProgress from '@material-ui/core/LinearProgress'
+import DoneIcon from '@material-ui/icons/Done'
 import UserContext from '../store/userContext'
 
 const useStyles = makeStyles((theme) => ({
@@ -66,14 +67,17 @@ export default function ActionCard(props) {
         // onDeleteAction(eventAction)
     }
 
-    const joinAction = async (eventActionId) => {
+    const joinAction = async (eventAction) => {
         try {
-            console.log('joinAction: ', eventActionId)
+            console.log('joinAction: ', eventAction)
+
+            // 3) Update state
+            props.onJoinAction(eventAction)
 
             // 1) Add auth user to event_actions_users table
             const { error: error1 } = await supabase.from('event_actions_users').insert([
                 {
-                    event_action_id: eventActionId,
+                    event_action_id: eventAction.id,
                     user_id: user.id,
                 },
             ])
@@ -83,11 +87,13 @@ export default function ActionCard(props) {
             }
 
             // 2) Increment counter
-            const { error2 } = await supabase.rpc('increment_participation_count_by_one', { row_id: parseInt(eventActionId) })
+            const { error2 } = await supabase.rpc('increment_participation_count_by_one', { row_id: parseInt(eventAction.id) })
             if (error2) {
                 console.log('error2: ', error2)
                 throw error2
             }
+
+            
         } catch (error) {
             console.log('error from joinAction: ', error)
         }
@@ -125,9 +131,13 @@ export default function ActionCard(props) {
                     Join
                 </Button>
             )
+        } else if (eventAction.has_joined) {
+            return (
+                <Button variant="outlined" size="small" color="primary" disabled={true}>Joined</Button>
+            )
         } else {
             return (
-                <Button variant="outlined" size="small" color="primary" onClick={() => joinAction(eventAction.id)}>
+                <Button variant="outlined" size="small" color="primary" onClick={() => joinAction(eventAction)}>
                     Join
                 </Button>
             )

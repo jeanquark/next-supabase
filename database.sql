@@ -212,7 +212,7 @@ DECLARE
 r int;
 BEGIN
 	IF new.number_participants = new.participation_threshold THEN
-    -- 1) Mark as complete
+    -- 1) Mark action as complete
 		UPDATE event_actions
     SET is_completed = true
 		WHERE id = new.id;

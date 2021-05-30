@@ -47,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             cursor: 'pointer',
             background: theme.palette.primary.main,
+            // background: rgba(0, 0, 0, 0.04),
             color: 'white',
         },
     },
@@ -70,6 +71,7 @@ export default function ActionList() {
     const [eventActions, setEventActions] = useState([])
     const [eventUsers, setEventUsers] = useState([])
     const [updateAction, handleUpdateAction] = useState('')
+    const [joinAction, handleJoinAction] = useState('')
     const [deleteAction, handleDeleteAction] = useState('')
     const userRef = useRef()
     const actionsRef = useRef()
@@ -109,8 +111,6 @@ export default function ActionList() {
     useEffect(() => {
         try {
             console.log('[useEffect] updateAction: ', updateAction)
-            // console.log('eventActions: ', eventActions)
-
             if (updateAction) {
                 const index = eventActions.findIndex((a) => a.id == updateAction.id)
                 console.log('index: ', index)
@@ -124,6 +124,22 @@ export default function ActionList() {
             console.log('error: ', error)
         }
     }, [updateAction])
+
+    useEffect(() => {
+        try {
+            console.log('[useEffect] joinAction: ', joinAction)
+            if (joinAction) {
+                const index = eventActions.findIndex((a) => a.id == joinAction.id)
+                console.log('index: ', index)
+                let newActions = [...eventActions]
+                newActions[index]['has_joined'] = true
+                console.log('newActions: ', newActions)
+                setEventActions(newActions)
+            }
+        } catch (error) {
+            console.log('error: ', error)
+        }
+    }, [joinAction])
 
     useEffect(() => {
         try {
@@ -179,7 +195,7 @@ export default function ActionList() {
                         handleUpdateAction(payload.new)
                     })
                     .subscribe()
-                console.log('mySubscription: ', mySubscription)
+                // console.log('mySubscription: ', mySubscription)
             } else {
                 supabase.removeSubscription(mySubscription)
                 console.log('Delete message')
@@ -220,7 +236,14 @@ export default function ActionList() {
                 if (errorUsers) console.log('error: ', errorUsers)
                 setEventUsers(users)
 
-                // 4) Retrieve
+                // 4) Retrieve all event actions user has already joined
+                const { data: joinedActions, errorJoinedActions } = await supabase.from('event_actions_users').select('*').eq('user_id', userRef.current.id)
+                if (errorJoinedActions) console.log('error: ', errorJoinedActions)
+                console.log('joinedActions: ', joinedActions)
+                for (let i = 0; i < joinedActions.length; i++) {
+                    handleJoinAction({ id: joinedActions[i]['event_action_id'] })
+                }
+
             }
         } catch (error) {
             console.log('error: ', error)
@@ -259,10 +282,9 @@ export default function ActionList() {
                 return
             }
             console.log('user.id: ', user.id)
-            // return
             const { data, error } = await supabase
                 .from('event_actions')
-                .insert([{ event_id: id, user_id: user.id, action_id: actionId, participation_threshold: calculateParticipationThreshold(), expired_at: calculateExpirationTime() }])
+                .insert([{ event_id: id, user_id: user.id, action_id: actionId, points: 10, participation_threshold: calculateParticipationThreshold(), expired_at: calculateExpirationTime() }])
 
             if (error) {
                 alert(error.message)
@@ -280,13 +302,16 @@ export default function ActionList() {
             <CssBaseline />
             <h1 style={{ textAlign: 'center' }}>Actions:</h1>
             <br />
-            <Box style={{ border: '1px solid orange' }}>
+            <Box display="flex" style={{ border: '1px solid orange' }}>
                 <h3>Event users:</h3>
                 {eventUsers.map((eventUser) => (
                     <Tooltip title={eventUser.users.username} key={eventUser.id}>
                         <Avatar alt={eventUser.users.username} src={`/images/avatar.png`} />
                     </Tooltip>
                 ))}
+                <Tooltip title="jeanquark">
+                    <Avatar alt="jeanquark" src={`/images/avatar.png`} />
+                </Tooltip>
             </Box>
             <h3>Choose action:</h3>
             <Box display="flex" style={{ border: '1px solid red' }}>
@@ -307,7 +332,7 @@ export default function ActionList() {
                     </Typography>
                     <List className={classes.list}>
                         {eventActions.map((eventAction) => (
-                            <ActionCard eventAction={eventAction} onDeleteAction={handleDeleteAction} key={eventAction.id} />
+                            <ActionCard eventAction={eventAction} onJoinAction={handleJoinAction} onDeleteAction={handleDeleteAction} key={eventAction.id} />
                         ))}
                     </List>
                 </Paper>
