@@ -25,7 +25,6 @@ import {
     NoSsr,
 } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
-import NavbarOriginal from '../components/Navbar_ORIGINAL'
 import Navbar from '../components/Navbar'
 import dynamic from 'next/dynamic'
 import Moment from 'react-moment'

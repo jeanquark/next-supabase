@@ -222,9 +222,9 @@ export default function Navbar() {
 							open={openAnchorEl}
 							onClose={handleClose}
 						>
-							<MenuItem>Profile</MenuItem>
-							<MenuItem>My account</MenuItem>
-							<MenuItem>Logout</MenuItem>
+							{/* <MenuItem>Profile</MenuItem> */}
+							{/* <MenuItem>My account</MenuItem> */}
+							<MenuItem onClick={handleLogout}>Logout</MenuItem>
 						</Menu>
 					</>}
 				</Toolbar>

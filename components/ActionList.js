@@ -131,10 +131,12 @@ export default function ActionList() {
             if (joinAction) {
                 const index = eventActions.findIndex((a) => a.id == joinAction.id)
                 console.log('index: ', index)
-                let newActions = [...eventActions]
-                newActions[index]['has_joined'] = true
-                console.log('newActions: ', newActions)
-                setEventActions(newActions)
+                if (index != -1) {
+                    let newActions = [...eventActions]
+                    newActions[index]['has_joined'] = true
+                    console.log('newActions: ', newActions)
+                    setEventActions(newActions)
+                }
             }
         } catch (error) {
             console.log('error: ', error)
