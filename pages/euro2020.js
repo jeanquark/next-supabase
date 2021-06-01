@@ -34,9 +34,6 @@ import moment from 'moment'
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
-        // '& > *': {
-        //     margin: theme.spacing(1),
-        // },
     },
     appBarSpacer: theme.mixins.toolbar,
     content: {

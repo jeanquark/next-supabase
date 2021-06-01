@@ -4,6 +4,10 @@
 -- CREATE ROLE "tif_admin" IN ROLE "authenticator"
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tif_admin;
 
+-----------------------
+-- Tables & policies --
+-----------------------
+
 /** 
 * USERS
 * Note: This table contains user data. Users should only be able to view and update their own data.
