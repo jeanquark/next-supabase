@@ -120,7 +120,7 @@ export default function index() {
 					</Grid>
 					<Grid container justify="center" alignItems="flex-end">
 						<p>next-supabase<br />
-						Last deployment time: Tuesday June 1st, 11:17.</p>
+						Last deployment time: Tuesday June 1st, 11:26.</p>
 					</Grid>
 				</Grid>
 				<Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
